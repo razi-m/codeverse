@@ -1,0 +1,30 @@
+node_modules/
+dist/
+build/
+
+# Hardhat
+artifacts/
+cache/
+typechain-types/
+
+# Secrets — never commit these
+.env
+.env.local
+*.env
+
+# Generated deployment artifacts (frontend keeps a committed placeholder)
+backend/src/deployment.json
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Workspace lockfiles live at the root only
+contracts/package-lock.json
+backend/package-lock.json
+frontend/package-lock.json
+
+# TS build info
+*.tsbuildinfo

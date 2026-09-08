@@ -1,0 +1,18 @@
+{
+  "name": "global-hackathon",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": ["contracts", "backend", "frontend"],
+  "scripts": {
+    "chain": "npm run node --workspace @global/contracts",
+    "deploy": "npm run deploy:local --workspace @global/contracts",
+    "dev": "concurrently -n api,web -c cyan,magenta \"npm run dev --workspace @global/backend\" \"npm run dev --workspace @global/frontend\"",
+    "dev:api": "npm run dev --workspace @global/backend",
+    "dev:web": "npm run dev --workspace @global/frontend",
+    "test": "npm test --workspace @global/contracts",
+    "typecheck": "npm run typecheck --workspace @global/backend && npm run typecheck --workspace @global/frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}
