@@ -58,13 +58,19 @@ export default function PolicyView() {
         setLedger(l);
         setVerify(v);
       } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message === "Policy not found"
-              ? "We couldn't find a policy with that ID. Please check the number and try again."
-              : "We couldn't reach the service right now. Please try again in a moment."
-            : "Something went wrong. Please try again."
-        );
+        // Three distinguishable failure modes (T4.7): unknown policy,
+        // backend entirely unreachable (fetch itself throws — no
+        // response at all), and the backend reachable but the chain
+        // read behind it failing (a specific 500 message).
+        if (err instanceof TypeError) {
+          setError("We couldn't reach KisanShield right now. Please check your connection and try again.");
+        } else if (err instanceof Error && err.message === "Policy not found") {
+          setError("We couldn't find a policy with that ID. Please check the number and try again.");
+        } else if (err instanceof Error && /deployment|RPC/i.test(err.message)) {
+          setError("The weather record service is temporarily unavailable. Please try again in a moment.");
+        } else {
+          setError("Something went wrong. Please try again.");
+        }
       } finally {
         if (!silent) setLoading(false);
       }

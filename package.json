@@ -6,6 +6,7 @@
   "scripts": {
     "chain": "npm run node --workspace @global/contracts",
     "deploy": "npm run deploy:local --workspace @global/contracts",
+    "seed": "npm run seed:local --workspace @global/contracts",
     "dev": "concurrently -n api,web -c cyan,magenta \"npm run dev --workspace @global/backend\" \"npm run dev --workspace @global/frontend\"",
     "dev:api": "npm run dev --workspace @global/backend",
     "dev:web": "npm run dev --workspace @global/frontend",

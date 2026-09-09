@@ -20,6 +20,14 @@
   --ended: #5c6360;
   --danger: #b91c1c;
 
+  /* Solid interactive surfaces (button--primary background). Distinct from
+     --active: that token is a status colour tuned as TEXT against --surface;
+     this one is tuned for white text ON TOP of it, which needs a
+     meaningfully darker/more saturated blue to clear 4.5:1 in both themes
+     (caught by an axe-core audit finding --active failed exactly this in
+     dark mode — T4.9). */
+  --accent-solid: #1d4ed8;
+
   /* Typography */
   --font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -62,6 +70,10 @@
     --waiting: #fbbf24;
     --ended: #9aa8a2;
     --danger: #f87171;
+
+    /* Kept dark (not the light #60a5fa --active uses) — white text on top
+       needs this, not a light-mode-style bright accent. */
+    --accent-solid: #2563eb;
   }
 }
 
