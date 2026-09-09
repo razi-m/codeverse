@@ -10,16 +10,16 @@ Parametric Crop Insurance with Automatic Payout (PS3)
 |---|---|
 | Last updated | 2026-09-09 |
 | Branch | `master` |
-| Last commit | P6 — Backend explanation and policy API |
+| Last commit | P7 — Farmer transparent claim ledger UI (M3) |
 | Budget | ~15h, solo developer |
 
 ---
 
 ## Project Status
 
-**Phase 0, P1, P2, P3, P4, P5, P6 complete. M1 and M2 reached. P6 awaiting review.**
+**Phase 0, P1, P2, P3, P4, P5, P6, P7 complete. M1, M2, and M3 reached. P7 awaiting review.**
 
-Implementation is divided into **eight coding phases (P1–P8)**, each ending at a review gate. P6 is done and stopped per Rule 16 — P7 does not begin without confirmation.
+Implementation is divided into **eight coding phases (P1–P8)**, each ending at a review gate. P7 is done and stopped per Rule 16 — P8 does not begin without confirmation.
 
 All eight Phase 0 deliverables exist, have been cross-reviewed, and are approved. No production code has been written or modified. The repository still contains the original `MessageBoard` scaffold at commit `73cd154`, unchanged.
 
@@ -27,8 +27,8 @@ Per [AgentRules.md](./docs/AgentRules.md) Rule 1, implementation may now begin, 
 
 ## Current Phase
 
-**P0, P1, P2, P3, P4, P5, P6 — complete. M1 and M2 reached.**
-**Next: P7 — Farmer transparent claim ledger UI (M3).**
+**P0, P1, P2, P3, P4, P5, P6, P7 — complete. M1, M2, M3 reached.**
+**Next: P8 — Insurer console and polish (M4).**
 
 Implementation is structured as **eight coding phases**, each ending at a hard stop for user review ([AgentRules.md](./docs/AgentRules.md) Rule 16). No phase begins without explicit confirmation that the previous one is accepted.
 
@@ -40,8 +40,8 @@ Implementation is structured as **eight coding phases**, each ending at a hard s
 | P3 | Deploy, seed and end-to-end payout | T1.13–T1.15 | 0.5h | M1 | **Complete — M1 reached** |
 | P4 | Supabase and data layer | T2.1–T2.5 | 1.5h | — | **Complete** |
 | P5 | Oracle harness and scenarios | T2.6–T2.10 | 1h | M2 | **Complete — M2 reached** |
-| P6 | Backend explanation and policy API | T3.1–T3.6 | 1.5h | — | **Complete — awaiting review** |
-| P7 | Farmer transparent claim ledger UI | T3.7–T3.17 | 2h | M3 | Not started |
+| P6 | Backend explanation and policy API | T3.1–T3.6 | 1.5h | — | **Complete** |
+| P7 | Farmer transparent claim ledger UI | T3.7–T3.17 | 2h | M3 | **Complete — M3 reached** |
 | P8 | Insurer console and polish | T4.1–T4.13 | 3.5h | M4 | Not started |
 
 | Milestone | Status | Est. cumulative | Reached at |
@@ -49,12 +49,12 @@ Implementation is structured as **eight coding phases**, each ending at a hard s
 | M0 Planning complete | **Complete** | 0h | end of P0 |
 | M1 Contract pays out | **Complete** | ~5h | end of P3 |
 | M2 Oracle simulation drives it | **Complete** | ~7.5h | end of P5 |
-| M3 Farmer can read the ledger | Not started | ~11h | end of P7 |
+| M3 Farmer can read the ledger | **Complete** | ~11h | end of P7 |
 | M4 Demo-ready | Not started | ~14.5h | end of P8 |
 
 ## Active Task
 
-**None — P6 complete, stopped for review per Rule 16.** P7 (T3.7–T3.17: router, farmer UI, M3 checkpoint) is next, and will not start without explicit confirmation.
+**None — P7 complete, M3 reached, stopped for review per Rule 16.** P8 (T4.1–T4.13: insurer console, polish, M4 checkpoint) is next, and will not start without explicit confirmation.
 
 ## Completed Tasks
 
@@ -148,17 +148,17 @@ Timeboxed per **TR4** — 45 minutes for T2.1–T2.3, then fall back to the in-m
 
 | ID | Description | Priority | Dependency | Status |
 |---|---|---|---|---|
-| T3.7 | Add router; convert `App.tsx` to route shell | Must | T2.10 | Not started |
-| T3.8 | Delete post components; update `api.ts`/`contract.ts` | Must | T3.7 | Not started |
-| T3.9 | Build design tokens, light and dark | Must | T3.7 | Not started |
-| T3.10 | Build shared components incl. `Money`, `Measurement` | Must | T3.9 | Not started |
-| T3.11 | Build `StatusBanner` — seven states | Must | T3.10 | Not started |
-| T3.12 | Build `PolicyTermsCard`, `ThresholdMeter` | Must | T3.10 | Not started |
-| T3.13 | Build `ClaimLedger`, `LedgerEntry` | Must | T3.10, T3.4 | Not started |
-| T3.14 | Build `VerifyPanel`, `HowThisWorks` | Should | T3.13 | Not started |
-| T3.15 | Build `/policy/:id` and `/` landing | Must | T3.11, T3.12, T3.13 | Not started |
-| T3.16 | Route code splitting — verify no wagmi on farmer bundle | Must | T3.15 | Not started |
-| T3.17 | **Checkpoint M3** — renders with no wallet extension | Must | T3.16 | Not started |
+| T3.7 | Add router; convert `App.tsx` to route shell | Must | T2.10 | Complete |
+| T3.8 | Delete post components; update `api.ts`/`contract.ts` | Must | T3.7 | Complete |
+| T3.9 | Build design tokens, light and dark | Must | T3.7 | Complete |
+| T3.10 | Build shared components incl. `Money`, `Measurement` | Must | T3.9 | Complete |
+| T3.11 | Build `StatusBanner` — seven states | Must | T3.10 | Complete |
+| T3.12 | Build `PolicyTermsCard`, `ThresholdMeter` | Must | T3.10 | Complete |
+| T3.13 | Build `ClaimLedger`, `LedgerEntry` | Must | T3.10, T3.4 | Complete |
+| T3.14 | Build `VerifyPanel`, `HowThisWorks` | Should | T3.13 | Complete |
+| T3.15 | Build `/policy/:id` and `/` landing | Must | T3.11, T3.12, T3.13 | Complete |
+| T3.16 | Route code splitting — verify no wagmi on farmer bundle | Must | T3.15 | Complete |
+| T3.17 | **Checkpoint M3** — renders with no wallet extension | Must | T3.16 | Complete |
 
 ### P8 — Insurer console and polish — **M4** (~3.5h)
 
@@ -233,6 +233,9 @@ Watch items, not yet blocking:
 | D21 | Oracle harness wallets are **long-lived module-level instances**, one per oracle index, and the two feed submissions run **sequentially, never `Promise.all`** | Found during P5 verification: re-instantiating `ethers.Wallet` per call and submitting concurrently caused a real "nonce has already been used" failure — evaluation reused the feed_a wallet right after a concurrent submission from that same wallet raced its own pending-nonce read. Fixed by caching one `Wallet` per address and awaiting each chain-writing call in turn |
 | D22 | `explain.ts`'s ETH→₹ conversion is a **named constant, 1 ETH = ₹1,000** | Neither Schema.md nor TRD state this explicitly, but Design.md's own worked example (`25000000000000000000 wei` → `₹25,000`, i.e. 25 ETH → ₹25,000) implies exactly this rate. Made explicit as `ETH_TO_RUPEES = 1_000` with a comment citing that example, rather than left implicit or guessed differently (e.g. 1:1, which is what a naive first pass produced and which a live ledger check caught as wrong) |
 | D23 | `PolicyEvent` (and `LedgerEntry`) carry an explicit `blockTimestamp`/`timestamp` field, fetched once per unique block in `getPolicyEvents` | Not every contract event carries its own timestamp in its args (`PayoutTriggered` does not) — only `blockNumber` is universal. A first draft of `summarize()` passed `blockNumber` to a date formatter expecting Unix seconds, which would have rendered nonsense dates. Caught before the fix was ever exercised against live data, by re-reading the function before running it |
+| D24 | `main.tsx` holds **no** `WagmiProvider`/`RainbowKitProvider` — those wrap only `pages/Admin.tsx`, itself loaded via `React.lazy()` from `App.tsx` | The scaffold's original `main.tsx` wrapped the entire app in wagmi/RainbowKit at the root — if routes had been added under that unchanged, wagmi would load on `/policy/:id` too, breaking D3 structurally rather than by convention. Restructuring the provider boundary to route-scope, not just adding a router, is what T3.16 actually required |
+| D25 | `ThresholdMeter`'s "current reading" is derived client-side from the `/verify` endpoint's raw `ConsensusReached` event args, unscaled by the same ÷100 rule as the backend, rather than a new dedicated endpoint | No backend route currently exposes "the latest reading for the active period" directly — adding one mid-P7 would have expanded P6's already-closed scope. The `/verify` payload already carries this data for the Verify panel, so the meter reuses it rather than duplicating a fetch. Revisit if verify's raw-event shape changes |
+| D26 | `explain.ts`'s ETH→₹ rate (`ETH_TO_RUPEES = 1_000`, D22) is duplicated as a literal in `PolicyTermsCard.tsx` for `coverageAmount` | The frontend receives `coverageAmount` as a formatted-ether string from `insurance.ts`, not pre-converted to rupees by `explain.ts` (which only touches event args, not the `Policy` struct itself) — so the terms card must apply the same rate itself. A shared constant would be cleaner; flagged as minor follow-up cleanup rather than blocking the phase, since both numbers are correct and match |
 
 ### Gaps found during T0.9 review, and their resolutions
 
@@ -446,9 +449,83 @@ npm test (root, contracts)              → 23 passing, unaffected
 | `docs/AgentRules.md` | Operating rules |
 | `TRACKER.md` | This file |
 
+### P7 — Farmer transparent claim ledger UI (M3)
+
+| File | Change |
+|---|---|
+| `frontend/src/main.tsx` | **Rewritten.** No `WagmiProvider`/`RainbowKitProvider` at the root — bare `BrowserRouter`. This is the structural fix, not just adding a router — **D24** |
+| `frontend/src/App.tsx` | **Rewritten.** Route shell: `/`, `/policy/:id` eager; `/admin` behind `React.lazy()` + `Suspense` |
+| `frontend/src/pages/Landing.tsx` | **Created.** `/` — `PolicyLookup` card, link to `/admin` |
+| `frontend/src/pages/PolicyView.tsx` | **Created.** `/policy/:id` — fetches policy + ledger + verify in parallel, 15s silent auto-refresh while `Active`, error/loading states |
+| `frontend/src/pages/PolicySkeleton.tsx` | **Created.** Sized to the final layout, no layout shift on load |
+| `frontend/src/pages/Admin.tsx` | **Created.** Owns `WagmiProvider`/`RainbowKitProvider` locally — the only file in the repo that imports them. Placeholder console shell; full build is P8 |
+| `frontend/src/components/farmer/*` | **Created (9 files).** `StatusBanner`, `PolicyTermsCard`, `ThresholdMeter` (with full text-equivalent accessible name), `ClaimLedger`, `LedgerEntry`, `VerifyPanel`, `HowThisWorks`, `PolicyLookup`, `FarmerErrorState` |
+| `frontend/src/components/shared/*` | **Created (6 files).** `Card`, `Button`, `Badge` (colour+icon+text, never colour alone), `Skeleton`, `Money`, `Measurement`, `DateDisplay` |
+| `frontend/src/styles/tokens.css` | **Created.** Full design-token system from Design.md — light/dark colour, farmer/insurer type scale via `[data-surface]`, spacing, motion, `prefers-reduced-motion` |
+| `frontend/src/styles/farmer.css` | **Created.** Component styles for every farmer component, mobile-first at 360px |
+| `frontend/src/styles.css` | **Deleted** — superseded by the two files above |
+| `frontend/src/lib/api.ts` | **Rewritten.** Domain types (`Policy`, `LedgerEntry`, `PolicyLedger`, `PolicyVerify`, `HealthStatus`) matching P6's actual route responses; same `fetch`/`BASE` pattern retained |
+| `frontend/src/components/PostComposer.tsx` | **Deleted** |
+| `frontend/src/components/PostList.tsx` | **Deleted** |
+| `frontend/package.json` | Added `react-router-dom` |
+
+**Architecture note — D24, the actual T3.16 fix:** the scaffold's original `main.tsx` wrapped the *entire app* in `WagmiProvider`/`RainbowKitProvider` at the root. Adding routes under that unchanged would have loaded wagmi on `/policy/:id` too — breaking the wallet-free guarantee structurally, not just by an oversight. The real fix was moving those providers *into* `Admin.tsx` itself, loaded only via `React.lazy()`. `main.tsx` and `App.tsx` for the farmer path now import zero wallet code, at any depth.
+
+Verified by execution — a real headless Chromium browser (Playwright, no wallet extension installed, exactly the T3.17 requirement by construction) against the real dev server with the real backend and real chain data from P3–P6:
+
+```
+Production build                     → succeeds; entry chunk (index-DxTuXAkH.js, 192KB)
+                                         grepped for "wagmi"/"RainbowKit"/"MetaMask"/
+                                         "WalletConnect" — ZERO matches in JS or CSS.
+                                         Only a React.lazy() import() reference exists
+/policy/3 (paid, drought scenario)   → full render: green "Paid — ₹1,000" banner, terms
+                                         card, threshold meter (bar below the marked
+                                         threshold), 6-entry chronological ledger ending
+                                         at policy creation — screenshot captured
+/policy/1 (disagreement scenario)    → correct render: blue banner citing the true most-
+                                         recent outcome, ledger shows the full disagreement
+                                         history, meter shows "No reading yet" (correctly —
+                                         ConsensusReached never fired for this policy)
+/ (landing)                          → PolicyLookup renders; typing "3" and submitting
+                                         navigates to /policy/3 correctly (real form
+                                         interaction, not just a static render)
+/policy/999 (not found)              → FarmerErrorState with retry button, role="alert",
+                                         non-technical copy
+/admin                                → renders via the lazy chunk; Connect Wallet button
+                                         present — confirmed this IS where wagmi/RainbowKit
+                                         load, proving the split is real, not accidental
+Network trace across all farmer      → zero requests matching wagmi/rainbowkit/
+  route visits                         walletconnect/metamask/reown/w3m
+Console errors across all visits     → NONE
+200% zoom @ 640px viewport           → no horizontal scroll
+360px mobile viewport                → no horizontal scroll, full render, single column
+ThresholdMeter aria-label            → "Rainfall 10mm, threshold 20mm — below threshold."
+                                         (exact format required by Design.md)
+StatusBanner attributes              → role="status", aria-live="polite" confirmed present
+How this works / Verify this record  → both expand via native <details>, correct content
+npm run typecheck (root)             → clean
+npm test (root, contracts)           → 23 passing, unaffected
+npm test (backend, explain.ts)       → 14 passing, unaffected
+```
+
+**M3 reached.** `/policy/:id` renders fully in a browser with no wallet extension — verified, not assumed.
+
+### Documentation
+
+| File | Purpose |
+|---|---|
+| `docs/PRD.md` | Product requirements |
+| `docs/TRD.md` | Technical requirements, contract specification |
+| `docs/UserFlows.md` | Journeys, decision trees, edge cases |
+| `docs/Design.md` | Design system, component inventory |
+| `docs/Schema.md` | Canonical data model, on-chain and off-chain |
+| `docs/ImplementationPlan.md` | Phased task breakdown |
+| `docs/AgentRules.md` | Operating rules |
+| `TRACKER.md` | This file |
+
 ### Pre-existing, untouched
 
-`frontend/` in full (its P6-affecting rewire — dropping `PostComposer`/`PostList`, adding the router — is P7 scope); `README.md`; `docs/PS3-context-for-claude-code.md`; `docs/phase0.md`; `docs/handoff.md`; `docs/README.md`.
+`README.md`; `docs/PS3-context-for-claude-code.md`; `docs/phase0.md`; `docs/handoff.md`; `docs/README.md`. `frontend/src/lib/contract.ts` and `frontend/src/lib/wagmi.ts` are reused as-is (Rule 6) — both are generic and needed by P8's admin console.
 
 ## Features Implemented
 
@@ -464,12 +541,12 @@ Against [PRD.md](./docs/PRD.md) core features:
 | CF2 | Registered-oracle data submission | P1–P2 | **Complete** |
 | CF3 | Multi-oracle consensus | P2 | **Complete** |
 | CF4 | Automatic trigger evaluation and payout | P2–P3 | **Complete — M1 verified live** |
-| CF5 | Plain-language claim ledger | P6–P7 | Backend complete (P6) — API returns full jargon-free ledgers; farmer-facing UI to render them is P7 |
-| CF6 | Wallet-free farmer access | P7 | Not started |
-| CF7 | Insurer admin console | P8 | Not started |
+| CF5 | Plain-language claim ledger | P6–P7 | **Complete — M3 verified live in a browser, no wallet extension** |
+| CF6 | Wallet-free farmer access | P7 | **Complete — structural (D24), verified by bundle inspection and network trace** |
+| CF7 | Insurer admin console | P8 | Route boundary exists (`Admin.tsx`, wallet-scoped) — full console is P8 |
 | CF8 | Oracle simulation harness | P5 | **Complete — M2 verified live, all 3 scenarios** |
 
-Every core feature has at least one implementing task — verified during T0.9.
+Every core feature has at least one implementing task — verified during T0.9. **Six of eight core features are now complete**, with only the insurer console (CF7) remaining.
 
 ## Bugs Found
 
@@ -488,6 +565,8 @@ Known scaffold issues carried over from [docs/handoff.md](./docs/handoff.md), fo
 | `npx tsc` resolves to a bogus `tsc@2.0.4` package | Use `./node_modules/.bin/tsc` |
 | Stale `backend/src/deployment.json` and `frontend/dist/` reference the old ABI | Overwritten on next deploy — harmless, but a stale-artifact demo failure is TR7 |
 
+Minor debt recorded, not a bug (see D26): the ETH→₹ rate is duplicated as a literal in `PolicyTermsCard.tsx` rather than shared with `explain.ts`'s constant — no cross-workspace shared-code path exists yet. Both numbers are correct and match; fix if a shared package is ever introduced.
+
 ## Bugs Fixed
 
 | Bug | Fixed at |
@@ -500,23 +579,24 @@ Known scaffold issues carried over from [docs/handoff.md](./docs/handoff.md), fo
 
 ## Next Actions
 
-**P6 is complete and stopped for review (Rule 16). Awaiting confirmation before P7 begins.**
+**P7 is complete, M3 reached, and stopped for review (Rule 16). Awaiting confirmation before P8 begins.**
 
-P7 — Farmer transparent claim ledger UI, **M3 checkpoint** (T3.7–T3.17), no new credentials needed:
+P8 — Insurer console and polish, **M4 checkpoint** (T4.1–T4.13), no new credentials needed:
 
-1. **T3.7** — add `react-router-dom`; convert `App.tsx` to a route shell with `BrowserRouter` in `main.tsx`
-2. **T3.8** — delete `PostComposer.tsx`/`PostList.tsx`; update `lib/api.ts`/`lib/contract.ts` to domain types
-3. **T3.9–T3.10** — design tokens (light/dark) and shared components (`Card`, `Button`, `Badge`, `Money`, `Measurement`, ...)
-4. **T3.11–T3.14** — `StatusBanner`, `PolicyTermsCard`, `ThresholdMeter`, `ClaimLedger`/`LedgerEntry`, `VerifyPanel`, `HowThisWorks`
-5. **T3.15** — `/policy/:id` page and `/` landing with `PolicyLookup`
-6. **T3.16** — route-level code splitting; confirm wagmi/RainbowKit are absent from the farmer bundle
-7. **T3.17 — Checkpoint M3** — open `/policy/1` in a browser **with no wallet extension installed**; verify full render across all three scenarios
+1. **T4.1** — `AdminGate`: wallet connect, owner check, read-only fallback (builds on the `Admin.tsx` shell from P7)
+2. **T4.2** — `PolicyTable` — dense portfolio view, unfunded-policy flagging
+3. **T4.3–T4.4** — `CreatePolicyForm`, `FundPolicyAction` (Should priority — first cuts if time runs short)
+4. **T4.5** — `OracleRegistry`, `OracleLivenessBadge`, blocking banner when fewer than two feeds registered
+5. **T4.6** — `TxStatus` — pending/confirmed/rejected, form state preserved on rejection
+6. **T4.7** — farmer error states with retry (`FarmerErrorState` already built in P7 — this wires it to backend-down and chain-down cases specifically)
+7. **T4.8** — skeleton loaders sized to final content across all views
+8. **T4.9** — accessibility audit — contrast both themes, keyboard nav, screen reader, 200% zoom, reduced motion (P7 already verified several of these live; this is the systematic pass)
+9. **T4.10** — plain-language audit — every farmer-facing string against the banned-vocabulary list (P7's `explain.ts` tests already assert this per-string; this is the full-surface sweep)
+10. **T4.11** — 15s auto-refresh on active policies (**already built in P7's `PolicyView.tsx`** — this task is effectively done, will confirm and mark complete)
+11. **T4.12** — update root `README.md` — replace MessageBoard references with run instructions and demo script
+12. **T4.13 — Checkpoint M4** — full demo script from a cold start, all three scenarios
 
-This is the largest remaining phase by task count. If it overruns, the first cuts are T3.5/T3.14 (`VerifyPanel`) — the backend `/verify` route stays, only its UI panel is deferred. The ledger itself is never cut.
-
-P8 (T4.1–T4.13, insurer console and polish, M4) does not begin until P7 is reviewed and confirmed.
-
-P7 (T3.7–T3.17, farmer UI, M3 checkpoint) does not begin until P6 is reviewed and confirmed.
+This is the last phase. Everything in it except the gate tasks is Should/Could (**TR8**) — M3 plus a seeded policy is already demonstrable on its own if P8 runs short.
 
 Before starting, read [docs/AgentRules.md](./docs/AgentRules.md), [docs/TRD.md](./docs/TRD.md) §Contract Specification, and [docs/Schema.md](./docs/Schema.md) — Schema is canonical for every entity and field name.
 

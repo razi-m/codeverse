@@ -1,0 +1,318 @@
+/* Farmer surface — docs/Design.md § Layout Principles, Mobile Experience.
+   One column, mobile-first at 360px, capped at 640px, generous spacing. */
+
+.farmer-page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: var(--sp-4) var(--sp-4) var(--sp-16);
+}
+
+@media (min-width: 768px) {
+  .farmer-page {
+    padding: var(--sp-6) var(--sp-4) var(--sp-16);
+  }
+}
+
+.farmer-page h1 {
+  font-size: var(--fs-h1);
+  margin: 0 0 var(--sp-4);
+}
+
+/* --- Card --- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: var(--sp-6);
+  margin-bottom: var(--sp-4);
+}
+
+/* --- Button --- */
+.button {
+  font: inherit;
+  font-size: var(--fs-body);
+  min-height: 44px;
+  min-width: 44px;
+  padding: var(--sp-3) var(--sp-6);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.button:hover {
+  border-color: var(--active);
+}
+
+.button--primary {
+  background: var(--active);
+  border-color: var(--active);
+  color: white;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* --- Badge --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: 999px;
+  font-size: var(--fs-small);
+  font-weight: 600;
+}
+
+.badge--paid {
+  background: color-mix(in srgb, var(--paid) 15%, transparent);
+  color: var(--paid);
+}
+.badge--active {
+  background: color-mix(in srgb, var(--active) 15%, transparent);
+  color: var(--active);
+}
+.badge--waiting {
+  background: color-mix(in srgb, var(--waiting) 15%, transparent);
+  color: var(--waiting);
+}
+.badge--ended {
+  background: color-mix(in srgb, var(--ended) 15%, transparent);
+  color: var(--ended);
+}
+
+/* --- StatusBanner --- */
+.status-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-6);
+  border-radius: 12px;
+  margin-bottom: var(--sp-6);
+  font-size: var(--fs-hero);
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+.status-banner__icon {
+  flex-shrink: 0;
+  font-size: 1.1em;
+  line-height: 1;
+}
+
+.status-banner--paid {
+  background: color-mix(in srgb, var(--paid) 12%, var(--surface));
+  color: var(--paid);
+}
+.status-banner--active {
+  background: color-mix(in srgb, var(--active) 10%, var(--surface));
+  color: var(--active);
+}
+.status-banner--waiting {
+  background: color-mix(in srgb, var(--waiting) 12%, var(--surface));
+  color: var(--waiting);
+}
+.status-banner--ended {
+  background: var(--surface-sunken);
+  color: var(--text-muted);
+}
+
+/* --- PolicyTermsCard --- */
+.terms-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4);
+}
+.terms-grid dt {
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+  margin: 0;
+}
+.terms-grid dd {
+  font-size: var(--fs-body);
+  margin: 0;
+  font-weight: 600;
+}
+
+/* --- ThresholdMeter --- */
+.threshold-meter {
+  margin-top: var(--sp-3);
+}
+.threshold-meter__track {
+  position: relative;
+  height: 12px;
+  border-radius: 6px;
+  background: var(--surface-sunken);
+  overflow: visible;
+  margin: var(--sp-6) 0 var(--sp-2);
+}
+.threshold-meter__fill {
+  height: 100%;
+  border-radius: 6px;
+  background: var(--active);
+  transition: width 300ms var(--ease-in-out);
+}
+.threshold-meter__fill--below {
+  background: var(--paid);
+}
+.threshold-meter__marker {
+  position: absolute;
+  top: -6px;
+  bottom: -6px;
+  width: 2px;
+  background: var(--text);
+}
+.threshold-meter__marker-label {
+  position: absolute;
+  top: -28px;
+  transform: translateX(-50%);
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.threshold-meter__labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+}
+
+/* --- ClaimLedger / LedgerEntry --- */
+.claim-ledger {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ledger-entry {
+  display: flex;
+  gap: var(--sp-4);
+  padding: var(--sp-4) 0;
+  border-bottom: 1px solid var(--border);
+  animation: ledger-appear 250ms var(--ease-out);
+}
+.ledger-entry:last-child {
+  border-bottom: none;
+}
+.ledger-entry__date {
+  flex-shrink: 0;
+  width: 84px;
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+}
+.ledger-entry__text {
+  font-size: var(--fs-body);
+}
+
+@keyframes ledger-appear {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- VerifyPanel / HowThisWorks (collapsible, closed by default) --- */
+.disclosure {
+  margin-bottom: var(--sp-4);
+}
+.disclosure__trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  width: 100%;
+  min-height: 44px;
+  background: none;
+  border: none;
+  padding: var(--sp-2) 0;
+  font: inherit;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+}
+.disclosure__chevron {
+  transition: transform 200ms var(--ease-out);
+}
+.disclosure[open] .disclosure__chevron {
+  transform: rotate(90deg);
+}
+.disclosure__content {
+  padding: var(--sp-2) 0 var(--sp-4);
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+}
+.disclosure__content code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  word-break: break-all;
+}
+
+/* --- PolicyLookup --- */
+.policy-lookup {
+  display: flex;
+  gap: var(--sp-2);
+}
+.policy-lookup input {
+  flex: 1;
+  min-height: 44px;
+  font: inherit;
+  font-size: var(--fs-body);
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* --- Skeleton --- */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-sunken) 25%,
+    var(--border) 50%,
+    var(--surface-sunken) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1200ms linear infinite;
+  border-radius: 6px;
+}
+@keyframes skeleton-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* --- FarmerErrorState --- */
+.error-state {
+  text-align: center;
+  padding: var(--sp-8) var(--sp-4);
+}
+.error-state__icon {
+  font-size: 2rem;
+  margin-bottom: var(--sp-2);
+}
+.error-state__text {
+  color: var(--text-muted);
+  margin-bottom: var(--sp-4);
+}
+
+/* --- Numbers --- */
+.money,
+.measurement {
+  font-variant-numeric: tabular-nums;
+}
+.num-hero {
+  font-size: var(--fs-num);
+  font-weight: 700;
+  line-height: 1.1;
+}

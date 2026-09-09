@@ -1,48 +1,26 @@
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useCallback, useEffect, useState } from "react";
-import { PostComposer } from "./components/PostComposer.js";
-import { PostList } from "./components/PostList.js";
-import { fetchHealth, fetchPosts, type Post } from "./lib/api.js";
+import { Suspense, lazy } from "react";
+import { Routes, Route } from "react-router-dom";
+import Landing from "./pages/Landing.js";
+import PolicyView from "./pages/PolicyView.js";
+
+// Lazy: this is the module boundary that keeps wagmi/RainbowKit out of the
+// farmer bundle (T3.16, D3, TRD PERF5). Landing and PolicyView never import
+// Admin.tsx directly, so their JS chunk never pulls in a wallet library.
+const Admin = lazy(() => import("./pages/Admin.js"));
 
 export default function App() {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState<string | null>(null);
-
-  const load = useCallback(async () => {
-    try {
-      const { posts } = await fetchPosts();
-      // Newest first.
-      setPosts([...posts].reverse());
-      setStatus(null);
-    } catch (err) {
-      setStatus(err instanceof Error ? err.message : "Failed to load posts");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    load();
-    fetchHealth()
-      .then((h) => {
-        if (!h.contract) setStatus("Contract not deployed yet — run npm run deploy:local");
-      })
-      .catch(() => setStatus("Backend unreachable — is it running on :4000?"));
-  }, [load]);
-
   return (
-    <div className="app">
-      <header>
-        <h1>Global</h1>
-        <ConnectButton />
-      </header>
-
-      <main>
-        {status && <p className="banner">{status}</p>}
-        <PostComposer onPosted={load} />
-        <PostList posts={posts} loading={loading} />
-      </main>
-    </div>
+    <Routes>
+      <Route path="/" element={<Landing />} />
+      <Route path="/policy/:id" element={<PolicyView />} />
+      <Route
+        path="/admin"
+        element={
+          <Suspense fallback={<div style={{ padding: 24 }}>Loading…</div>}>
+            <Admin />
+          </Suspense>
+        }
+      />
+    </Routes>
   );
 }

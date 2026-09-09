@@ -1,0 +1,111 @@
+/* Design tokens — docs/Design.md. Light values on :root, dark values
+   under prefers-color-scheme, per-theme scale differences (farmer vs
+   insurer) applied at the component level via data attributes. */
+
+:root {
+  color-scheme: light;
+
+  /* Core */
+  --bg: #fbfaf8;
+  --surface: #ffffff;
+  --surface-sunken: #f4f2ee;
+  --border: #e3e0d9;
+  --text: #1a1c1a;
+  --text-muted: #5c6360;
+
+  /* Semantic states */
+  --paid: #047857;
+  --active: #1d4ed8;
+  --waiting: #b45309;
+  --ended: #5c6360;
+  --danger: #b91c1c;
+
+  /* Typography */
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Farmer type scale */
+  --fs-hero: 28px;
+  --fs-h1: 22px;
+  --fs-h2: 18px;
+  --fs-body: 17px;
+  --fs-small: 15px;
+  --fs-num: 34px;
+
+  /* Spacing (4px base) */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #0e1512;
+    --surface: #16201c;
+    --surface-sunken: #111a17;
+    --border: #26332d;
+    --text: #eef2ef;
+    --text-muted: #9aa8a2;
+
+    --paid: #34d399;
+    --active: #60a5fa;
+    --waiting: #fbbf24;
+    --ended: #9aa8a2;
+    --danger: #f87171;
+  }
+}
+
+/* Insurer surface: standard density, smaller scale (Design.md § Typography). */
+[data-surface="insurer"] {
+  --fs-hero: 24px;
+  --fs-h1: 20px;
+  --fs-h2: 16px;
+  --fs-body: 15px;
+  --fs-small: 13px;
+  --fs-num: 20px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--active);
+}
+
+:focus-visible {
+  outline: 2px solid var(--active);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
