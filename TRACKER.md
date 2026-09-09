@@ -1,0 +1,321 @@
+# TRACKER — KisanShield
+
+**Single source of truth for project state.**
+Parametric Crop Insurance with Automatic Payout (PS3)
+
+> **Mandatory:** update this file after every change. No implementation may occur without updating it.
+> See [docs/AgentRules.md](./docs/AgentRules.md) Rule 3 and Rule 14.
+
+| | |
+|---|---|
+| Last updated | 2026-09-09 |
+| Branch | `master` |
+| Last commit | `73cd154` — Scaffold blockchain hackathon dApp |
+| Budget | ~15h, solo developer |
+
+---
+
+## Project Status
+
+**Phase 0 complete — planning approved. Implementation not started.**
+
+Implementation is divided into **eight coding phases (P1–P8)**, each ending at a review gate.
+
+All eight Phase 0 deliverables exist, have been cross-reviewed, and are approved. No production code has been written or modified. The repository still contains the original `MessageBoard` scaffold at commit `73cd154`, unchanged.
+
+Per [AgentRules.md](./docs/AgentRules.md) Rule 1, implementation may now begin, starting at **T1.1**.
+
+## Current Phase
+
+**P0 — Planning and documentation** → complete.
+**Next: P1 — Contract foundation and policy lifecycle.**
+
+Implementation is structured as **eight coding phases**, each ending at a hard stop for user review ([AgentRules.md](./docs/AgentRules.md) Rule 16). No phase begins without explicit confirmation that the previous one is accepted.
+
+| Phase | Focus | Tasks | Est. | Milestone | Status |
+|---|---|---|---|---|---|
+| P0 | Planning and documentation | T0.1–T0.9 | 1h | M0 | **Complete** |
+| P1 | Contract foundation and policy lifecycle | T1.1–T1.6 | 1.5h | — | Not started |
+| P2 | Consensus, evaluation and payout | T1.7–T1.12 | 2h | — | Not started |
+| P3 | Deploy, seed and end-to-end payout | T1.13–T1.15 | 0.5h | M1 | Not started |
+| P4 | Supabase and data layer | T2.1–T2.5 | 1.5h | — | Not started |
+| P5 | Oracle harness and scenarios | T2.6–T2.10 | 1h | M2 | Not started |
+| P6 | Backend explanation and policy API | T3.1–T3.6 | 1.5h | — | Not started |
+| P7 | Farmer transparent claim ledger UI | T3.7–T3.17 | 2h | M3 | Not started |
+| P8 | Insurer console and polish | T4.1–T4.13 | 3.5h | M4 | Not started |
+
+| Milestone | Status | Est. cumulative | Reached at |
+|---|---|---|---|
+| M0 Planning complete | **Complete** | 0h | end of P0 |
+| M1 Contract pays out | Not started | ~5h | end of P3 |
+| M2 Oracle simulation drives it | Not started | ~7.5h | end of P5 |
+| M3 Farmer can read the ledger | Not started | ~11h | end of P7 |
+| M4 Demo-ready | Not started | ~14.5h | end of P8 |
+
+## Active Task
+
+**None.** Awaiting start of **P1 — Contract foundation and policy lifecycle** (T1.1–T1.6).
+
+Next task is **T1.1** — add OpenZeppelin contracts dependency to `contracts/`.
+
+## Completed Tasks
+
+| ID | Description | Completed |
+|---|---|---|
+| T0.1 | Write PRD (`docs/PRD.md`) | 2026-09-09 |
+| T0.2 | Write TRD (`docs/TRD.md`) | 2026-09-09 |
+| T0.3 | Write User Flows (`docs/UserFlows.md`) | 2026-09-09 |
+| T0.4 | Write Design doc (`docs/Design.md`) | 2026-09-09 |
+| T0.5 | Write Schema (`docs/Schema.md`) | 2026-09-09 |
+| T0.6 | Write Implementation Plan (`docs/ImplementationPlan.md`) | 2026-09-09 |
+| T0.7 | Write Tracker (`TRACKER.md`) | 2026-09-09 |
+| T0.8 | Write Agent Rules (`docs/AgentRules.md`) | 2026-09-09 |
+| T0.9 | Cross-document consistency review | 2026-09-09 |
+
+## Pending Tasks
+
+Mirrors [ImplementationPlan.md](./docs/ImplementationPlan.md). **Task IDs must match exactly between the two files.**
+
+### P1 — Contract foundation and policy lifecycle (~1.5h)
+
+No money can move at the end of this phase — `evaluatePolicy` does not exist yet.
+
+| ID | Description | Priority | Dependency | Status |
+|---|---|---|---|---|
+| T1.1 | Add OpenZeppelin contracts dependency | Must | T0.9 | Not started |
+| T1.2 | Delete `MessageBoard.sol` and its test | Must | T1.1 | Not started |
+| T1.3 | Create `CropInsurance.sol` — enums, structs, storage, errors, `Ownable` | Must | T1.2 | Not started |
+| T1.4 | Implement `createPolicy` | Must | T1.3 | Not started |
+| T1.5 | Implement `fundPolicy` escrow | Must | T1.4 | Not started |
+| T1.6 | Implement oracle register/deregister | Must | T1.3 | Not started |
+
+### P2 — Consensus, evaluation and payout (~2h)
+
+Every arithmetic decision that can misdirect money. Note **D8** (strictly below) and **D6** (permissionless).
+
+| ID | Description | Priority | Dependency | Status |
+|---|---|---|---|---|
+| T1.7 | Implement `submitReading` with duplicate guard | Must | T1.6 | Not started |
+| T1.8 | Implement consensus — spread, tolerance, mean | Must | T1.7 | Not started |
+| T1.9 | Implement `evaluatePolicy` — all six reject codes, payout | Must | T1.8 | Not started |
+| T1.10 | Implement `cancelPolicy` with refund | Should | T1.5 | Not started |
+| T1.11 | Implement view functions | Must | T1.9 | Not started |
+| T1.12 | Write contract test suite | Must | T1.11 | Not started |
+
+### P3 — Deploy, seed and end-to-end payout — **M1** (~0.5h)
+
+| ID | Description | Priority | Dependency | Status |
+|---|---|---|---|---|
+| T1.13 | Update `deploy.js` contract name | Must | T1.3 | Not started |
+| T1.14 | Write `seed.js` — oracles, demo policy, funding | Must | T1.13 | Not started |
+| T1.15 | **Checkpoint M1** — end-to-end payout verified | Must | T1.14 | Not started |
+
+### P4 — Supabase and data layer (~1.5h)
+
+Timeboxed per **TR4** — 45 minutes for T2.1–T2.3, then fall back to the in-memory fixture.
+
+| ID | Description | Priority | Dependency | Status |
+|---|---|---|---|---|
+| T2.1 | Add `@supabase/supabase-js`; create project | Must | T1.15 | Not started |
+| T2.2 | Apply schema SQL — tables, constraints, indexes, trigger, RLS | Must | T2.1 | Not started |
+| T2.3 | Seed `oracle_sources` and `weather_feed`, all three scenarios | Must | T2.2 | Not started |
+| T2.4 | Create `services/supabase.ts` with graceful degradation | Must | T2.1 | Not started |
+| T2.5 | Replace `chain.ts` with `insurance.ts` | Must | T1.13 | Not started |
+
+### P5 — Oracle harness and scenarios — **M2** (~1h)
+
+| ID | Description | Priority | Dependency | Status |
+|---|---|---|---|---|
+| T2.6 | Build oracle harness — two signers, scaling | Must | T2.3, T2.5 | Not started |
+| T2.7 | Add `POST /api/oracle/simulate` | Must | T2.6 | Not started |
+| T2.8 | Extend `GET /api/health` | Should | T2.4 | Not started |
+| T2.9 | Add `GET /api/oracles` | Should | T2.5 | Not started |
+| T2.10 | **Checkpoint M2** — all scenarios; Supabase-down verified | Must | T2.7 | Not started |
+
+### P6 — Backend explanation and policy API (~1.5h)
+
+`explain.ts` is built and unit-tested before any interface exists to render it.
+
+| ID | Description | Priority | Dependency | Status |
+|---|---|---|---|---|
+| T3.1 | Create `services/explain.ts` | Must | T2.5 | Not started |
+| T3.2 | Unit-test `explain.ts` — all six reject codes | Must | T3.1 | Not started |
+| T3.3 | Replace `routes/posts.ts` with `policies.ts` | Must | T2.5 | Not started |
+| T3.4 | Add `GET /api/policies/:id/ledger` | Must | T3.1, T3.3 | Not started |
+| T3.5 | Add `GET /api/policies/:id/verify` | Should | T3.3 | Not started |
+| T3.6 | Update `index.ts` route mounting | Must | T3.3 | Not started |
+
+### P7 — Farmer transparent claim ledger UI — **M3** (~2h)
+
+| ID | Description | Priority | Dependency | Status |
+|---|---|---|---|---|
+| T3.7 | Add router; convert `App.tsx` to route shell | Must | T2.10 | Not started |
+| T3.8 | Delete post components; update `api.ts`/`contract.ts` | Must | T3.7 | Not started |
+| T3.9 | Build design tokens, light and dark | Must | T3.7 | Not started |
+| T3.10 | Build shared components incl. `Money`, `Measurement` | Must | T3.9 | Not started |
+| T3.11 | Build `StatusBanner` — seven states | Must | T3.10 | Not started |
+| T3.12 | Build `PolicyTermsCard`, `ThresholdMeter` | Must | T3.10 | Not started |
+| T3.13 | Build `ClaimLedger`, `LedgerEntry` | Must | T3.10, T3.4 | Not started |
+| T3.14 | Build `VerifyPanel`, `HowThisWorks` | Should | T3.13 | Not started |
+| T3.15 | Build `/policy/:id` and `/` landing | Must | T3.11, T3.12, T3.13 | Not started |
+| T3.16 | Route code splitting — verify no wagmi on farmer bundle | Must | T3.15 | Not started |
+| T3.17 | **Checkpoint M3** — renders with no wallet extension | Must | T3.16 | Not started |
+
+### P8 — Insurer console and polish — **M4** (~3.5h)
+
+Everything except the gate tasks is Should or Could — the cut buffer (**TR8**).
+
+| ID | Description | Priority | Dependency | Status |
+|---|---|---|---|---|
+| T4.1 | Build `AdminGate` | Must | T3.17 | Not started |
+| T4.2 | Build `PolicyTable` with unfunded flagging | Must | T4.1 | Not started |
+| T4.3 | Build `CreatePolicyForm` | Should | T4.1 | Not started |
+| T4.4 | Build `FundPolicyAction` | Should | T4.3 | Not started |
+| T4.5 | Build `OracleRegistry`, liveness badge, blocking banner | Must | T4.1 | Not started |
+| T4.6 | Build `TxStatus` | Should | T4.3 | Not started |
+| T4.7 | Farmer error states with retry | Must | T3.15 | Not started |
+| T4.8 | Skeleton loaders | Should | T3.10 | Not started |
+| T4.9 | Accessibility audit | Must | T4.7 | Not started |
+| T4.10 | Plain-language audit | Must | T4.7 | Not started |
+| T4.11 | 15s auto-refresh on active policies | Could | T3.15 | Not started |
+| T4.12 | Update root `README.md` | Must | T4.10 | Not started |
+| T4.13 | **Checkpoint M4** — full demo script cold start | Must | T4.12 | Not started |
+
+### P9 — Post-MVP backlog (not scheduled)
+
+Recorded, not scheduled. Per user instruction (2026-09-09): build the MVP through P8 first; these are architecture notes for features still being researched, not tasks to implement now. **Do not start before P8 is reviewed and accepted.** No task IDs assigned. Full detail: [ImplementationPlan.md § P9](./docs/ImplementationPlan.md#p9--post-mvp-backlog-not-scheduled-not-estimated).
+
+Candidates: explainable claim view ("why was I paid/rejected"), multi-language explanations (Hindi/Marathi/Telugu), notification router (WhatsApp → voice → SMS fallback), Twilio-backed SMS/voice behind a demo-mode adapter, payout→notification event flow off `PayoutTriggered`, on-chain `NotificationSent` audit event.
+
+Binding constraints when this is eventually scheduled: same EVM/Solidity/Hardhat/ethers stack, no Hyperledger Fabric or chain change; copy still routes through `explain.ts`; no wagmi on farmer routes; on-chain audit data stays minimal (PII off-chain, **D12**); demo mode needs zero external credentials; explanations stay deterministic over structured data, never free-generated.
+
+## Blockers
+
+**None.**
+
+Watch items, not yet blocking:
+
+| Item | Affects | Note |
+|---|---|---|
+| Supabase project not yet created | T2.1 | Timeboxed to 45 min at TR4; in-memory fixture fallback defined |
+| No Supabase account credentials in the repo | T2.1 | `.env.example` only; real keys must never be committed |
+
+## Decisions Made
+
+### Locked in Phase 0
+
+| # | Decision | Rationale |
+|---|---|---|
+| D1 | **Supabase (Postgres) as off-chain store** | Confirmed by user. Does not exist yet — new construction. Strictly non-authoritative: dropping it must not change any payout or lose any decision record |
+| D2 | **Multi-oracle consensus is a core feature, not a nice-to-have** | Confirmed by user. It is the answer to "why not just a database". Two independent feeds must agree within tolerance before any payout. First on the cut list only if the demo would otherwise not run |
+| D3 | **Farmer access is public lookup by policy ID** | Confirmed by user. No wallet, no login, no install. Enforced structurally — the farmer route does not import wagmi |
+| D4 | **Docs-only session; no code before approval** | Confirmed by user, per `docs/phase0.md` and Rule 1 |
+
+### Architectural decisions
+
+| # | Decision | Rationale |
+|---|---|---|
+| D5 | `MessageBoard.sol` is **deleted, not refactored** | Zero domain overlap — no access control, no roles, no escrow, no oracle interface. Only infrastructure is inherited |
+| D6 | `evaluatePolicy` is **permissionless** | A privileged evaluator could suppress a payout by never calling, recreating the discretionary gate the system exists to remove |
+| D7 | Measurements are `uint256` **scaled ×100** | Solidity has no floats. One uniform scale across threshold, tolerance, and reading values makes the mismatched-scale bug class impossible at the comparison site |
+| D8 | Trigger is **strictly below** threshold | Equal-to-threshold does not pay. Fixed by an explicit test — the ambiguity is worth one farmer's payout |
+| D9 | Status set to `PaidOut` **before** transfer | Checks-effects-interactions; closes the reentrancy path |
+| D10 | Evaluation failures **emit `PayoutRejected`, never revert** | A revert leaves no record. The farmer's right to an explained non-payout is a core requirement |
+| D11 | History lives in **events, not storage** | Cheaper, immutable, queryable by indexed `policyId`. The ledger is reconstructible from logs alone |
+| D12 | Farmer PII stays **off-chain** | On-chain data is permanently public and irremovable. The chain holds an address and an opaque region code |
+| D13 | Deploy artifact pattern **retained from scaffold** | `deploy.js` writing `deployment.json` to both backend and frontend keeps address and ABI in sync across workspaces automatically |
+| D14 | Split data path **retained**: reads via backend, writes via wagmi | Already gives the farmer a wallet-free read path with no additional work |
+| D15 | OpenZeppelin `Ownable` rather than hand-rolled | Audited and minimal; hand-rolling access control is needless risk given no prior blockchain expertise |
+| D16 | **Local Hardhat node only** for the demo | No network dependency, no faucet, no gas, fully reproducible from cold start |
+| D17 | All farmer-facing strings originate in `explain.ts` | Gives the plain-language audit exactly one target file |
+| D18 | **No celebratory animation on payout** | A payout means a crop failed. The moment gets clarity and dignity, not confetti |
+
+### Gaps found during T0.9 review, and their resolutions
+
+| Gap | Resolution |
+|---|---|
+| `periodId` semantics were unspecified — two feeds could submit for the same window under different identifiers, making agreement meaningless | Defined in Schema.md as days since epoch of the window start, derived identically by both feeds from the `weather_feed` row |
+| Whether a value exactly equal to the threshold pays was ambiguous across documents | Fixed as **strictly below** (D8), stated in TRD, UserFlows E1, and Schema, with a required boundary test at T1.12 |
+| Nothing prevented one oracle submitting twice to manufacture agreement with itself | Added the `hasSubmitted` mapping and `DuplicateReading` error; recorded as edge case E3 |
+| Reject-reason granularity was insufficient for a plain-language explanation — a single "not triggered" code could not distinguish disagreement from an unmet threshold | Expanded to six distinct reason codes, each with fixed farmer-facing copy |
+| "Supabase is non-authoritative" was asserted but not testable | Made operational: the payout path must be verified working with Supabase unreachable, gated at T2.10 |
+| The wallet-free guarantee rested on convention and could regress silently | Made structural — route-level code splitting keeps wagmi off the farmer bundle, verified by inspection at T3.16 and in a clean browser profile at T3.17 |
+
+## Files Modified
+
+**None.** No source file has been created, modified, or deleted.
+
+### Created this session — documentation only
+
+| File | Purpose |
+|---|---|
+| `docs/PRD.md` | Product requirements |
+| `docs/TRD.md` | Technical requirements, contract specification |
+| `docs/UserFlows.md` | Journeys, decision trees, edge cases |
+| `docs/Design.md` | Design system, component inventory |
+| `docs/Schema.md` | Canonical data model, on-chain and off-chain |
+| `docs/ImplementationPlan.md` | Phased task breakdown |
+| `docs/AgentRules.md` | Operating rules |
+| `TRACKER.md` | This file |
+
+### Pre-existing, untouched
+
+`contracts/`, `backend/`, `frontend/` in full; `README.md`; `docs/PS3-context-for-claude-code.md`; `docs/phase0.md`; `docs/handoff.md`; `docs/README.md`.
+
+## Features Implemented
+
+**None.** The repository contains the original `MessageBoard` demo scaffold — a message board with tipping, with no relation to crop insurance.
+
+## Features Remaining
+
+All of them. Against [PRD.md](./docs/PRD.md) core features:
+
+| ID | Feature | Phase | Status |
+|---|---|---|---|
+| CF1 | On-chain policy registry | P1 | Not started |
+| CF2 | Registered-oracle data submission | P1–P2 | Not started |
+| CF3 | Multi-oracle consensus | P2 | Not started |
+| CF4 | Automatic trigger evaluation and payout | P2–P3 | Not started |
+| CF5 | Plain-language claim ledger | P6–P7 | Not started |
+| CF6 | Wallet-free farmer access | P7 | Not started |
+| CF7 | Insurer admin console | P8 | Not started |
+| CF8 | Oracle simulation harness | P5 | Not started |
+
+Every core feature has at least one implementing task — verified during T0.9.
+
+## Bugs Found
+
+**None.** No implementation code exists yet.
+
+Known scaffold issues carried over from [docs/handoff.md](./docs/handoff.md), for awareness rather than action:
+
+| Issue | Note |
+|---|---|
+| `npx tsc` resolves to a bogus `tsc@2.0.4` package | Use `./node_modules/.bin/tsc` |
+| Stale `backend/src/deployment.json` and `frontend/dist/` reference the old ABI | Overwritten on next deploy — harmless, but a stale-artifact demo failure is TR7 |
+
+## Bugs Fixed
+
+**None.**
+
+## Next Actions
+
+**P1 only.** Work stops at the end of P1 and waits for review (Rule 16).
+
+1. **T1.1** — add OpenZeppelin contracts to `contracts/`
+2. **T1.2** — delete `MessageBoard.sol` and `MessageBoard.test.js`
+3. **T1.3** — create `CropInsurance.sol` skeleton: enums, structs, storage, custom errors, `Ownable`
+4. **T1.4–T1.5** — `createPolicy` with term validation; `fundPolicy` escrow
+5. **T1.6** — oracle register/deregister with `oracleList` enumeration
+6. Verify: contract compiles, `npm run typecheck` clean, `MessageBoard` artefacts gone
+7. Update this tracker, commit P1 as a single commit with the tracker included, **then stop and report**
+
+P2 (T1.7–T1.12) does not begin until P1 is reviewed and confirmed.
+
+Before starting, read [docs/AgentRules.md](./docs/AgentRules.md), [docs/TRD.md](./docs/TRD.md) §Contract Specification, and [docs/Schema.md](./docs/Schema.md) — Schema is canonical for every entity and field name.
+
+---
+
+## Related documents
+
+- [PRD](./docs/PRD.md) · [TRD](./docs/TRD.md) · [User Flows](./docs/UserFlows.md) · [Design](./docs/Design.md) · [Schema](./docs/Schema.md) · [Implementation Plan](./docs/ImplementationPlan.md) · [Agent Rules](./docs/AgentRules.md)
