@@ -10,16 +10,16 @@ Parametric Crop Insurance with Automatic Payout (PS3)
 |---|---|
 | Last updated | 2026-09-09 |
 | Branch | `master` |
-| Last commit | `73cd154` — Scaffold blockchain hackathon dApp |
+| Last commit | P1 — Contract foundation and policy lifecycle |
 | Budget | ~15h, solo developer |
 
 ---
 
 ## Project Status
 
-**Phase 0 complete — planning approved. Implementation not started.**
+**Phase 0 complete. P1 complete, awaiting review.**
 
-Implementation is divided into **eight coding phases (P1–P8)**, each ending at a review gate.
+Implementation is divided into **eight coding phases (P1–P8)**, each ending at a review gate. P1 is done and stopped per Rule 16 — P2 does not begin without confirmation.
 
 All eight Phase 0 deliverables exist, have been cross-reviewed, and are approved. No production code has been written or modified. The repository still contains the original `MessageBoard` scaffold at commit `73cd154`, unchanged.
 
@@ -35,7 +35,7 @@ Implementation is structured as **eight coding phases**, each ending at a hard s
 | Phase | Focus | Tasks | Est. | Milestone | Status |
 |---|---|---|---|---|---|
 | P0 | Planning and documentation | T0.1–T0.9 | 1h | M0 | **Complete** |
-| P1 | Contract foundation and policy lifecycle | T1.1–T1.6 | 1.5h | — | Not started |
+| P1 | Contract foundation and policy lifecycle | T1.1–T1.6 | 1.5h | — | **Complete — awaiting review** |
 | P2 | Consensus, evaluation and payout | T1.7–T1.12 | 2h | — | Not started |
 | P3 | Deploy, seed and end-to-end payout | T1.13–T1.15 | 0.5h | M1 | Not started |
 | P4 | Supabase and data layer | T2.1–T2.5 | 1.5h | — | Not started |
@@ -54,9 +54,7 @@ Implementation is structured as **eight coding phases**, each ending at a hard s
 
 ## Active Task
 
-**None.** Awaiting start of **P1 — Contract foundation and policy lifecycle** (T1.1–T1.6).
-
-Next task is **T1.1** — add OpenZeppelin contracts dependency to `contracts/`.
+**None — P1 complete, stopped for review per Rule 16.** P2 (T1.7–T1.12: consensus, evaluatePolicy, tests) is next, and will not start without explicit confirmation.
 
 ## Completed Tasks
 
@@ -82,12 +80,12 @@ No money can move at the end of this phase — `evaluatePolicy` does not exist y
 
 | ID | Description | Priority | Dependency | Status |
 |---|---|---|---|---|
-| T1.1 | Add OpenZeppelin contracts dependency | Must | T0.9 | Not started |
-| T1.2 | Delete `MessageBoard.sol` and its test | Must | T1.1 | Not started |
-| T1.3 | Create `CropInsurance.sol` — enums, structs, storage, errors, `Ownable` | Must | T1.2 | Not started |
-| T1.4 | Implement `createPolicy` | Must | T1.3 | Not started |
-| T1.5 | Implement `fundPolicy` escrow | Must | T1.4 | Not started |
-| T1.6 | Implement oracle register/deregister | Must | T1.3 | Not started |
+| T1.1 | Add OpenZeppelin contracts dependency | Must | T0.9 | Complete |
+| T1.2 | Delete `MessageBoard.sol` and its test | Must | T1.1 | Complete |
+| T1.3 | Create `CropInsurance.sol` — enums, structs, storage, errors, `Ownable` | Must | T1.2 | Complete |
+| T1.4 | Implement `createPolicy` | Must | T1.3 | Complete |
+| T1.5 | Implement `fundPolicy` escrow | Must | T1.4 | Complete |
+| T1.6 | Implement oracle register/deregister | Must | T1.3 | Complete |
 
 ### P2 — Consensus, evaluation and payout (~2h)
 
@@ -243,9 +241,19 @@ Watch items, not yet blocking:
 
 ## Files Modified
 
-**None.** No source file has been created, modified, or deleted.
+### P1 — Contract foundation and policy lifecycle
 
-### Created this session — documentation only
+| File | Change |
+|---|---|
+| `contracts/contracts/CropInsurance.sol` | **Created.** Enums (`TriggerType`, `PolicyStatus`), `Policy`/`Reading` structs, storage (`policies`, `readings`, `hasSubmitted`, oracle registry), custom errors, `Ownable`. `createPolicy`, `fundPolicy`, `cancelPolicy`, `registerOracle`/`deregisterOracle`, view functions. `submitReading`/`evaluatePolicy` deliberately not yet implemented — P2 scope |
+| `contracts/contracts/MessageBoard.sol` | **Deleted** — D5 |
+| `contracts/test/MessageBoard.test.js` | **Deleted** — no replacement test suite yet; T1.12 (P2) writes the `CropInsurance` suite |
+| `contracts/package.json` | Added `@openzeppelin/contracts` dependency |
+| `package-lock.json` | Updated by npm install |
+
+Verified by execution: `npx hardhat compile` — clean, 3 files, evm target paris. `npm run typecheck` at root — clean (backend/frontend unaffected, as expected — they don't reference the contract until P2/P4). `npm test` **not run** — no test file exists yet for `CropInsurance.sol`; deferred to T1.12 in P2 by design, not an oversight.
+
+### Documentation
 
 | File | Purpose |
 |---|---|
@@ -260,20 +268,20 @@ Watch items, not yet blocking:
 
 ### Pre-existing, untouched
 
-`contracts/`, `backend/`, `frontend/` in full; `README.md`; `docs/PS3-context-for-claude-code.md`; `docs/phase0.md`; `docs/handoff.md`; `docs/README.md`.
+`backend/`, `frontend/` in full; `README.md`; `docs/PS3-context-for-claude-code.md`; `docs/phase0.md`; `docs/handoff.md`; `docs/README.md`.
 
 ## Features Implemented
 
-**None.** The repository contains the original `MessageBoard` demo scaffold — a message board with tipping, with no relation to crop insurance.
+**CF1 partially** — on-chain policy registry exists (`createPolicy`, `fundPolicy`, `cancelPolicy`, view functions), and oracle registration exists, but nothing pays out yet: `submitReading` and `evaluatePolicy` are P2. `MessageBoard` is fully removed.
 
 ## Features Remaining
 
-All of them. Against [PRD.md](./docs/PRD.md) core features:
+Against [PRD.md](./docs/PRD.md) core features:
 
 | ID | Feature | Phase | Status |
 |---|---|---|---|
-| CF1 | On-chain policy registry | P1 | Not started |
-| CF2 | Registered-oracle data submission | P1–P2 | Not started |
+| CF1 | On-chain policy registry | P1 | **Complete** |
+| CF2 | Registered-oracle data submission | P1–P2 | P1 done (registration); submission is P2 |
 | CF3 | Multi-oracle consensus | P2 | Not started |
 | CF4 | Automatic trigger evaluation and payout | P2–P3 | Not started |
 | CF5 | Plain-language claim ledger | P6–P7 | Not started |
@@ -300,17 +308,18 @@ Known scaffold issues carried over from [docs/handoff.md](./docs/handoff.md), fo
 
 ## Next Actions
 
-**P1 only.** Work stops at the end of P1 and waits for review (Rule 16).
+**P1 is complete and stopped for review (Rule 16). Awaiting confirmation before P2 begins.**
 
-1. **T1.1** — add OpenZeppelin contracts to `contracts/`
-2. **T1.2** — delete `MessageBoard.sol` and `MessageBoard.test.js`
-3. **T1.3** — create `CropInsurance.sol` skeleton: enums, structs, storage, custom errors, `Ownable`
-4. **T1.4–T1.5** — `createPolicy` with term validation; `fundPolicy` escrow
-5. **T1.6** — oracle register/deregister with `oracleList` enumeration
-6. Verify: contract compiles, `npm run typecheck` clean, `MessageBoard` artefacts gone
-7. Update this tracker, commit P1 as a single commit with the tracker included, **then stop and report**
+P2 — Consensus, evaluation and payout (T1.7–T1.12), no credentials needed, pure Solidity/Hardhat:
 
-P2 (T1.7–T1.12) does not begin until P1 is reviewed and confirmed.
+1. **T1.7** — `submitReading` with `onlyRegisteredOracle` and duplicate-per-period guard
+2. **T1.8** — consensus: spread, tolerance check, mean, `ConsensusReached`/`ConsensusFailed`
+3. **T1.9** — `evaluatePolicy`: permissionless, all six reject codes, strictly-below trigger, status-before-transfer payout
+4. **T1.10** — `cancelPolicy` refund (already implemented in P1, ahead of schedule — will confirm still correct)
+5. **T1.11** — remaining view functions (already implemented in P1)
+6. **T1.12** — full contract test suite including the equal-to-threshold boundary and reentrancy case
+
+P3 (T1.13–T1.15, deploy/seed/M1 checkpoint) does not begin until P2 is reviewed and confirmed.
 
 Before starting, read [docs/AgentRules.md](./docs/AgentRules.md), [docs/TRD.md](./docs/TRD.md) §Contract Specification, and [docs/Schema.md](./docs/Schema.md) — Schema is canonical for every entity and field name.
 
