@@ -10,16 +10,16 @@ Parametric Crop Insurance with Automatic Payout (PS3)
 |---|---|
 | Last updated | 2026-09-09 |
 | Branch | `master` |
-| Last commit | P3 — Deploy, seed and end-to-end payout (M1) |
+| Last commit | P4 — Supabase and data layer |
 | Budget | ~15h, solo developer |
 
 ---
 
 ## Project Status
 
-**Phase 0, P1, P2, P3 complete. M1 reached — contract pays out, verified end-to-end on a local node. P3 awaiting review.**
+**Phase 0, P1, P2, P3, P4 complete. M1 reached. P4 awaiting review.**
 
-Implementation is divided into **eight coding phases (P1–P8)**, each ending at a review gate. P3 is done and stopped per Rule 16 — P4 does not begin without confirmation, and needs a Supabase URL + anon key from the user first.
+Implementation is divided into **eight coding phases (P1–P8)**, each ending at a review gate. P4 is done and stopped per Rule 16 — P5 does not begin without confirmation.
 
 All eight Phase 0 deliverables exist, have been cross-reviewed, and are approved. No production code has been written or modified. The repository still contains the original `MessageBoard` scaffold at commit `73cd154`, unchanged.
 
@@ -27,8 +27,8 @@ Per [AgentRules.md](./docs/AgentRules.md) Rule 1, implementation may now begin, 
 
 ## Current Phase
 
-**P0, P1, P2, P3 — complete. M1 reached.**
-**Next: P4 — Supabase and data layer.**
+**P0, P1, P2, P3, P4 — complete. M1 reached.**
+**Next: P5 — Oracle harness and scenarios (M2).**
 
 Implementation is structured as **eight coding phases**, each ending at a hard stop for user review ([AgentRules.md](./docs/AgentRules.md) Rule 16). No phase begins without explicit confirmation that the previous one is accepted.
 
@@ -37,8 +37,8 @@ Implementation is structured as **eight coding phases**, each ending at a hard s
 | P0 | Planning and documentation | T0.1–T0.9 | 1h | M0 | **Complete** |
 | P1 | Contract foundation and policy lifecycle | T1.1–T1.6 | 1.5h | — | **Complete** |
 | P2 | Consensus, evaluation and payout | T1.7–T1.12 | 2h | — | **Complete** |
-| P3 | Deploy, seed and end-to-end payout | T1.13–T1.15 | 0.5h | M1 | **Complete — M1 reached, awaiting review** |
-| P4 | Supabase and data layer | T2.1–T2.5 | 1.5h | — | Not started |
+| P3 | Deploy, seed and end-to-end payout | T1.13–T1.15 | 0.5h | M1 | **Complete — M1 reached** |
+| P4 | Supabase and data layer | T2.1–T2.5 | 1.5h | — | **Complete — awaiting review** |
 | P5 | Oracle harness and scenarios | T2.6–T2.10 | 1h | M2 | Not started |
 | P6 | Backend explanation and policy API | T3.1–T3.6 | 1.5h | — | Not started |
 | P7 | Farmer transparent claim ledger UI | T3.7–T3.17 | 2h | M3 | Not started |
@@ -54,7 +54,7 @@ Implementation is structured as **eight coding phases**, each ending at a hard s
 
 ## Active Task
 
-**None — P3 complete, M1 reached, stopped for review per Rule 16.** P4 (T2.1–T2.5: Supabase and data layer) is next, and will not start without explicit confirmation. **P4 needs a Supabase project URL + anon key from the user before it can proceed.**
+**None — P4 complete, stopped for review per Rule 16.** P5 (T2.6–T2.10: oracle harness, M2 checkpoint) is next, and will not start without explicit confirmation.
 
 ## Completed Tasks
 
@@ -114,11 +114,11 @@ Timeboxed per **TR4** — 45 minutes for T2.1–T2.3, then fall back to the in-m
 
 | ID | Description | Priority | Dependency | Status |
 |---|---|---|---|---|
-| T2.1 | Add `@supabase/supabase-js`; create project | Must | T1.15 | Not started |
-| T2.2 | Apply schema SQL — tables, constraints, indexes, trigger, RLS | Must | T2.1 | Not started |
-| T2.3 | Seed `oracle_sources` and `weather_feed`, all three scenarios | Must | T2.2 | Not started |
-| T2.4 | Create `services/supabase.ts` with graceful degradation | Must | T2.1 | Not started |
-| T2.5 | Replace `chain.ts` with `insurance.ts` | Must | T1.13 | Not started |
+| T2.1 | Add `@supabase/supabase-js`; create project | Must | T1.15 | Complete |
+| T2.2 | Apply schema SQL — tables, constraints, indexes, trigger, RLS | Must | T2.1 | Complete |
+| T2.3 | Seed `oracle_sources` and `weather_feed`, all three scenarios | Must | T2.2 | Complete |
+| T2.4 | Create `services/supabase.ts` with graceful degradation | Must | T2.1 | Complete |
+| T2.5 | Replace `chain.ts` with `insurance.ts` | Must | T1.13 | Complete |
 
 ### P5 — Oracle harness and scenarios — **M2** (~1h)
 
@@ -229,6 +229,7 @@ Watch items, not yet blocking:
 | D17 | All farmer-facing strings originate in `explain.ts` | Gives the plain-language audit exactly one target file |
 | D18 | **No celebratory animation on payout** | A payout means a crop failed. The moment gets clarity and dignity, not confetti |
 | D19 | `evaluatePolicy` converts `periodId` (days-since-epoch) to seconds — `periodId * 1 days` — before comparing against `startDate`/`endDate` (Unix seconds) | Caught before compile in P2: comparing the two directly would have been exactly the scale-mismatch bug class D7/TR3 exists to prevent. Schema.md defines `periodId` as days-since-epoch but `startDate`/`endDate` as Unix seconds — the two were never given a common unit until now |
+| D20 | Supabase accessed via the **anon key with a permissive per-table policy**, not `service_role` with no anonymous policy as Schema.md specifies | User instruction (2026-09-09): `service_role` key not available this session. What's preserved: the browser still never receives any Supabase key — the anon key lives only in `backend/.env`, exactly where `service_role` would have. What's weakened: if the anon key leaked, it would grant read/write on these tables, where a leaked `service_role` key would be no worse. Acceptable for a hackathon demo on non-authoritative (D1) data with no real farmer PII; revisit — swap to `service_role`, drop the policies — before any non-demo use. Documented at the top of `backend/sql/schema.sql` |
 
 ### Gaps found during T0.9 review, and their resolutions
 
@@ -291,6 +292,46 @@ npm run typecheck        → clean
 
 **M1 reached.** This is the first demonstrable product per [ImplementationPlan.md](./docs/ImplementationPlan.md): a funded policy that pays automatically on agreeing sub-threshold readings.
 
+### P4 — Supabase and data layer
+
+| File | Change |
+|---|---|
+| `backend/package.json` | Added `@supabase/supabase-js` |
+| `backend/sql/schema.sql` | **Created.** All five tables (`farmers`, `policy_metadata`, `weather_feed`, `oracle_sources`, `claim_explanations`) per Schema.md, `set_updated_at` trigger, RLS enabled on every table. Deviates from spec — anon key + permissive per-table policies + explicit `GRANT`s instead of `service_role` with no anonymous policy — **D20** |
+| `backend/sql/seed.sql` | **Created.** Seeds `oracle_sources` (2 feeds, matching the P3 demo policy's oracle signer addresses) and `weather_feed` with all three scenarios — baseline (34/36mm, above 20mm threshold), drought (9/11mm, below threshold, agreeing), disagreement (5/30mm, spread exceeds 5mm tolerance) — for region `MH-VID-04` |
+| `backend/src/services/supabase.ts` | **Created.** Typed client + query functions for all five tables; every query wrapped in `safe()`, degrades to `null` on any failure (missing config, network error, Supabase down) rather than throwing |
+| `backend/src/services/insurance.ts` | **Created.** Replaces `chain.ts` for on-chain reads — `getPolicy`, `getPolicyCount`, `listPolicies`, `getReadings`, `isRegisteredOracle`, `getOracleList`, `getChainStatus`; 5s TTL cache retained from `chain.ts` (Rule 6); unscales ×100 values back to real units before leaving the file (D7) |
+| `backend/.env` | **Created, gitignored.** `SUPABASE_URL`/`SUPABASE_ANON_KEY` from the user-provided project |
+| `backend/.env.example` | Documents the two new vars (no real values) |
+| `backend/src/config.ts` | Reads `SUPABASE_URL`/`SUPABASE_ANON_KEY`, both nullable — absence is a valid, handled state |
+
+`routes/posts.ts` and `index.ts` are **not yet rewired** to `insurance.ts`/`supabase.ts` — that's T3.3/T3.6 in P6. They still import `chain.ts` (untouched, still works) so the app keeps building through P4/P5.
+
+**Real bug found and fixed during verification:** the first schema apply left `anon` with RLS policies but no table-level `GRANT` — Postgres checks grants before policies, so every query failed with "permission denied" despite the policies being correct. Fixed by adding explicit `grant select, insert, update, delete ... to anon` after the policies. Caught by actually querying the live database, not by reading the SQL.
+
+Verified by execution — real Supabase project, not mocked:
+
+```
+schema.sql applied via pooler connection → all 5 tables created, RLS enabled (confirmed via
+                                             information_schema + pg_class query)
+seed.sql applied                        → 6 weather_feed rows (3 scenarios × 2 feeds) + 2 oracle_sources,
+                                             confirmed via SELECT
+insurance.ts smoke test (live chain)    → getPolicy(1) correctly reads back the P3 demo policy:
+                                             thresholdValue=20, toleranceValue=5 (unscaled from
+                                             chain's 2000/500), status=1 (PaidOut, from the P3 payout),
+                                             oracleList=[oracleA, oracleB] — matches seed.js exactly
+supabase.ts smoke test (live DB)        → all 3 scenarios readable after the GRANT fix; oracle_sources
+                                             readable
+supabase.ts degrade test                → pointed at a nonexistent host; getWeatherFeed() returned
+                                             null, did not throw — PASS
+npm run typecheck (root)                → clean
+npm test (root)                         → 23 passing, unaffected
+```
+
+Temporary verification scripts (`_p4-smoke-test.ts`, `_p4-degrade-test.ts`) were deleted after use — not part of the committed tree.
+
+**Credential handling:** the Supabase DB password (used once, for the pooler connection to apply DDL) was passed only as a shell environment variable in this session and never written to any file; the one-off `pg` script and its `node_modules` were deleted from the scratchpad after use. The long-lived credential — the anon key — lives only in `backend/.env`, which is gitignored (confirmed via `git check-ignore` before writing it).
+
 ### Documentation
 
 | File | Purpose |
@@ -310,7 +351,7 @@ npm run typecheck        → clean
 
 ## Features Implemented
 
-**CF1–CF4 complete, verified live.** Policy registry, oracle registration/submission, multi-oracle consensus, and automatic trigger evaluation and payout all work end-to-end on a deployed local contract — not just unit-tested. Nothing off-chain (backend/frontend) yet — that starts P4.
+**CF1–CF4 complete, verified live on-chain.** Policy registry, oracle registration/submission, multi-oracle consensus, automatic trigger evaluation and payout. **Off-chain data layer complete** — Supabase schema live with all three demo scenarios seeded, backend can read both chain and off-chain state. Nothing wired into HTTP routes yet — `posts.ts`/`index.ts` still serve the old `MessageBoard` shape; that rewire is P6.
 
 ## Features Remaining
 
@@ -325,7 +366,7 @@ Against [PRD.md](./docs/PRD.md) core features:
 | CF5 | Plain-language claim ledger | P6–P7 | Not started |
 | CF6 | Wallet-free farmer access | P7 | Not started |
 | CF7 | Insurer admin console | P8 | Not started |
-| CF8 | Oracle simulation harness | P5 | Not started |
+| CF8 | Oracle simulation harness | P5 | Not started — data layer it depends on (P4) is ready |
 
 Every core feature has at least one implementing task — verified during T0.9.
 
@@ -334,6 +375,7 @@ Every core feature has at least one implementing task — verified during T0.9.
 | Bug | Found at | Fix |
 |---|---|---|
 | `evaluatePolicy` compared `periodId` (days-since-epoch) directly against `startDate`/`endDate` (Unix seconds) — a unit-scale mismatch | P2, before compile | Convert `periodId * 1 days` before comparing — **D19** |
+| Supabase `anon` role had RLS policies but no table-level `GRANT` — every query returned "permission denied" | P4, during verification (live query against real DB) | Added explicit `grant select, insert, update, delete ... to anon` in `schema.sql`, applied to the live project |
 
 Known scaffold issues carried over from [docs/handoff.md](./docs/handoff.md), for awareness rather than action:
 
@@ -347,22 +389,22 @@ Known scaffold issues carried over from [docs/handoff.md](./docs/handoff.md), fo
 | Bug | Fixed at |
 |---|---|
 | `periodId`/date unit-scale mismatch in `evaluatePolicy` (see Bugs Found) | P2, before compile — never shipped |
+| Supabase `anon` missing `GRANT`s (see Bugs Found) | P4, before this phase was reported complete |
 
 ## Next Actions
 
-**P3 is complete, M1 reached, and stopped for review (Rule 16). Awaiting confirmation before P4 begins.**
+**P4 is complete and stopped for review (Rule 16). Awaiting confirmation before P5 begins.**
 
-**P4 needs a credential before it can start:** a Supabase project URL and anon key (create a free project at supabase.com if one doesn't exist yet). I will ask for this at the start of P4 rather than blocking silently.
+P5 — Oracle harness and scenarios, **M2 checkpoint** (T2.6–T2.10, including the new **T2.6a** adapter interface — user instruction, 2026-09-09), no new credentials needed:
 
-P4 — Supabase and data layer (T2.1–T2.5), timeboxed to 45 minutes for T2.1–T2.3 per **TR4**, with an in-memory fixture fallback if it overruns:
+1. **T2.6** — oracle harness: reads `weather_feed` via `supabase.ts`, scales ×100, submits from the two registered oracle signer keys
+2. **T2.6a** — `WeatherSource` adapter interface: extract the harness's data read behind `fetchReading(regionId, periodId)`; Supabase becomes the default implementation rather than a hardcoded call site, so a real IMD/Sentinel adapter later is a config swap, not a rewrite
+3. **T2.7** — `POST /api/oracle/simulate` — scenario and feed selection for demo control
+4. **T2.8** — extend `GET /api/health` with oracle registration and Supabase reachability
+5. **T2.9** — `GET /api/oracles` — registered feeds with last-submission time
+6. **T2.10 — Checkpoint M2** — all three scenarios reproducible from a cold start; payout path verified working **with Supabase unreachable** (already proven possible at the service layer in P4 — T2.10 proves it through the full harness)
 
-1. **T2.1** — add `@supabase/supabase-js`; connect to the user-provided project
-2. **T2.2** — apply schema SQL: five tables, constraints, indexes, `set_updated_at` trigger, RLS
-3. **T2.3** — seed `oracle_sources` and `weather_feed` with all three demo scenarios
-4. **T2.4** — `services/supabase.ts` — every query degrades to `null` on failure, never throws
-5. **T2.5** — replace `chain.ts` with `insurance.ts`: read-only contract access, 5s TTL cache
-
-P5 (T2.6–T2.10, oracle harness, M2 checkpoint) does not begin until P4 is reviewed and confirmed. P5 also carries a new item, **T2.6a**, added per user instruction 2026-09-09: wrap the harness's data read behind a `WeatherSource` adapter interface once T2.6 works, so real IMD/Sentinel feeds can later replace the simulated one without touching the contract or the (future, P9) notification pipeline.
+P6 (T3.1–T3.6, `explain.ts` and policy API) does not begin until P5 is reviewed and confirmed.
 
 Before starting, read [docs/AgentRules.md](./docs/AgentRules.md), [docs/TRD.md](./docs/TRD.md) §Contract Specification, and [docs/Schema.md](./docs/Schema.md) — Schema is canonical for every entity and field name.
 
