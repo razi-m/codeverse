@@ -10,16 +10,16 @@ Parametric Crop Insurance with Automatic Payout (PS3)
 |---|---|
 | Last updated | 2026-09-09 |
 | Branch | `master` |
-| Last commit | P5 — Oracle harness and scenarios (M2) |
+| Last commit | P6 — Backend explanation and policy API |
 | Budget | ~15h, solo developer |
 
 ---
 
 ## Project Status
 
-**Phase 0, P1, P2, P3, P4, P5 complete. M1 and M2 reached. P5 awaiting review.**
+**Phase 0, P1, P2, P3, P4, P5, P6 complete. M1 and M2 reached. P6 awaiting review.**
 
-Implementation is divided into **eight coding phases (P1–P8)**, each ending at a review gate. P5 is done and stopped per Rule 16 — P6 does not begin without confirmation.
+Implementation is divided into **eight coding phases (P1–P8)**, each ending at a review gate. P6 is done and stopped per Rule 16 — P7 does not begin without confirmation.
 
 All eight Phase 0 deliverables exist, have been cross-reviewed, and are approved. No production code has been written or modified. The repository still contains the original `MessageBoard` scaffold at commit `73cd154`, unchanged.
 
@@ -27,8 +27,8 @@ Per [AgentRules.md](./docs/AgentRules.md) Rule 1, implementation may now begin, 
 
 ## Current Phase
 
-**P0, P1, P2, P3, P4, P5 — complete. M1 and M2 reached.**
-**Next: P6 — Backend explanation and policy API.**
+**P0, P1, P2, P3, P4, P5, P6 — complete. M1 and M2 reached.**
+**Next: P7 — Farmer transparent claim ledger UI (M3).**
 
 Implementation is structured as **eight coding phases**, each ending at a hard stop for user review ([AgentRules.md](./docs/AgentRules.md) Rule 16). No phase begins without explicit confirmation that the previous one is accepted.
 
@@ -40,7 +40,7 @@ Implementation is structured as **eight coding phases**, each ending at a hard s
 | P3 | Deploy, seed and end-to-end payout | T1.13–T1.15 | 0.5h | M1 | **Complete — M1 reached** |
 | P4 | Supabase and data layer | T2.1–T2.5 | 1.5h | — | **Complete** |
 | P5 | Oracle harness and scenarios | T2.6–T2.10 | 1h | M2 | **Complete — M2 reached** |
-| P6 | Backend explanation and policy API | T3.1–T3.6 | 1.5h | — | Not started |
+| P6 | Backend explanation and policy API | T3.1–T3.6 | 1.5h | — | **Complete — awaiting review** |
 | P7 | Farmer transparent claim ledger UI | T3.7–T3.17 | 2h | M3 | Not started |
 | P8 | Insurer console and polish | T4.1–T4.13 | 3.5h | M4 | Not started |
 
@@ -54,7 +54,7 @@ Implementation is structured as **eight coding phases**, each ending at a hard s
 
 ## Active Task
 
-**None — P5 complete, M2 reached, stopped for review per Rule 16.** P6 (T3.1–T3.6: `explain.ts`, policy/ledger API) is next, and will not start without explicit confirmation.
+**None — P6 complete, stopped for review per Rule 16.** P7 (T3.7–T3.17: router, farmer UI, M3 checkpoint) is next, and will not start without explicit confirmation.
 
 ## Completed Tasks
 
@@ -137,12 +137,12 @@ Timeboxed per **TR4** — 45 minutes for T2.1–T2.3, then fall back to the in-m
 
 | ID | Description | Priority | Dependency | Status |
 |---|---|---|---|---|
-| T3.1 | Create `services/explain.ts` | Must | T2.5 | Not started |
-| T3.2 | Unit-test `explain.ts` — all six reject codes | Must | T3.1 | Not started |
-| T3.3 | Replace `routes/posts.ts` with `policies.ts` | Must | T2.5 | Not started |
-| T3.4 | Add `GET /api/policies/:id/ledger` | Must | T3.1, T3.3 | Not started |
-| T3.5 | Add `GET /api/policies/:id/verify` | Should | T3.3 | Not started |
-| T3.6 | Update `index.ts` route mounting | Must | T3.3 | Not started |
+| T3.1 | Create `services/explain.ts` | Must | T2.5 | Complete |
+| T3.2 | Unit-test `explain.ts` — all six reject codes | Must | T3.1 | Complete |
+| T3.3 | Replace `routes/posts.ts` with `policies.ts` | Must | T2.5 | Complete |
+| T3.4 | Add `GET /api/policies/:id/ledger` | Must | T3.1, T3.3 | Complete |
+| T3.5 | Add `GET /api/policies/:id/verify` | Should | T3.3 | Complete |
+| T3.6 | Update `index.ts` route mounting | Must | T3.3 | Complete |
 
 ### P7 — Farmer transparent claim ledger UI — **M3** (~2h)
 
@@ -231,6 +231,8 @@ Watch items, not yet blocking:
 | D19 | `evaluatePolicy` converts `periodId` (days-since-epoch) to seconds — `periodId * 1 days` — before comparing against `startDate`/`endDate` (Unix seconds) | Caught before compile in P2: comparing the two directly would have been exactly the scale-mismatch bug class D7/TR3 exists to prevent. Schema.md defines `periodId` as days-since-epoch but `startDate`/`endDate` as Unix seconds — the two were never given a common unit until now |
 | D20 | Supabase accessed via the **anon key with a permissive per-table policy**, not `service_role` with no anonymous policy as Schema.md specifies | User instruction (2026-09-09): `service_role` key not available this session. What's preserved: the browser still never receives any Supabase key — the anon key lives only in `backend/.env`, exactly where `service_role` would have. What's weakened: if the anon key leaked, it would grant read/write on these tables, where a leaked `service_role` key would be no worse. Acceptable for a hackathon demo on non-authoritative (D1) data with no real farmer PII; revisit — swap to `service_role`, drop the policies — before any non-demo use. Documented at the top of `backend/sql/schema.sql` |
 | D21 | Oracle harness wallets are **long-lived module-level instances**, one per oracle index, and the two feed submissions run **sequentially, never `Promise.all`** | Found during P5 verification: re-instantiating `ethers.Wallet` per call and submitting concurrently caused a real "nonce has already been used" failure — evaluation reused the feed_a wallet right after a concurrent submission from that same wallet raced its own pending-nonce read. Fixed by caching one `Wallet` per address and awaiting each chain-writing call in turn |
+| D22 | `explain.ts`'s ETH→₹ conversion is a **named constant, 1 ETH = ₹1,000** | Neither Schema.md nor TRD state this explicitly, but Design.md's own worked example (`25000000000000000000 wei` → `₹25,000`, i.e. 25 ETH → ₹25,000) implies exactly this rate. Made explicit as `ETH_TO_RUPEES = 1_000` with a comment citing that example, rather than left implicit or guessed differently (e.g. 1:1, which is what a naive first pass produced and which a live ledger check caught as wrong) |
+| D23 | `PolicyEvent` (and `LedgerEntry`) carry an explicit `blockTimestamp`/`timestamp` field, fetched once per unique block in `getPolicyEvents` | Not every contract event carries its own timestamp in its args (`PayoutTriggered` does not) — only `blockNumber` is universal. A first draft of `summarize()` passed `blockNumber` to a date formatter expecting Unix seconds, which would have rendered nonsense dates. Caught before the fix was ever exercised against live data, by re-reading the function before running it |
 
 ### Gaps found during T0.9 review, and their resolutions
 
@@ -389,13 +391,68 @@ npm test (root)                            → 23 passing, unaffected
 | `docs/AgentRules.md` | Operating rules |
 | `TRACKER.md` | This file |
 
+### P6 — Backend explanation and policy API
+
+| File | Change |
+|---|---|
+| `backend/src/services/insurance.ts` | Added `getPolicyEvents(policyId)` — queries all 8 policy-scoped events filtered by indexed `policyId`, sorted chronologically, with `blockTimestamp` resolved once per unique block (not once per event) and attached to every `PolicyEvent` — **D23** |
+| `backend/src/services/explain.ts` | **Created.** Single source of every farmer-facing string (D17). `buildLedger()` converts a raw event array into plain-language `LedgerEntry[]`; `summarize()` derives the one-line status headline from the same data so it can never disagree with the ledger below it. Banned-vocabulary list from Design.md kept as an in-file comment. `ETH_TO_RUPEES = 1_000` named constant — **D22** |
+| `backend/src/services/explain.test.ts` | **Created.** 14 unit tests: all six `PayoutRejected` reason codes, all other event types, an unrecognised-code fallback, ledger ordering, and `summarize()` — every test also asserts against the full Design.md banned-vocabulary list, not just spot-checking |
+| `backend/src/routes/policies.ts` | **Created**, replaces `routes/posts.ts`. `GET /api/policies` (paginated, same offset/limit/MAX_LIMIT convention as the retired route), `GET /api/policies/:id`, `GET /api/policies/:id/ledger` (the centrepiece), `GET /api/policies/:id/verify` (raw proof). Region display name resolved from Supabase, degrading to the raw region code — never fails the response |
+| `backend/src/index.ts` | Mounts `policiesRouter` at `/api/policies`; `/api/health` now reads `insurance.ts` in place of `chain.ts` |
+| `backend/src/routes/posts.ts` | **Deleted** — MessageBoard-era route, no longer referenced anywhere |
+| `backend/src/services/chain.ts` | **Deleted** — MessageBoard-era service, fully superseded by `insurance.ts` (T2.5, P4) |
+| `backend/package.json` | Added `test` script — `node --import tsx --test`, no new test-framework dependency |
+
+**Real bug found and fixed during verification — D22:** a live ledger check showed "Paid — ₹1" for a 1 ETH payout. Design.md's own worked example (`25000000000000000000 wei` → `₹25,000`) implies **1 ETH = ₹1,000**, not the 1:1 a first pass had assumed. Fixed with a named constant and re-verified live — the same policy now correctly reads "Paid — ₹1,000".
+
+**Second issue caught before it ran — D23:** `summarize()`'s first draft passed a raw `blockNumber` to a date formatter expecting Unix seconds (not every event, e.g. `PayoutTriggered`, carries its own timestamp in its args). Caught by re-reading the function before executing it, not by a failed test — fixed by resolving and attaching a real `blockTimestamp` to every `PolicyEvent` in `insurance.ts`.
+
+Verified by execution — real deployed contract with real event history (3 policies from P5: disagreement, baseline, drought/paid), not mocked:
+
+```
+npm test (backend, explain.ts)          → 14 passing, includes a banned-vocabulary
+                                            assertion against every rendered string
+GET /api/policies                       → 3 policies, real terms, regionDisplayName
+                                            degrading to raw regionId (no metadata seeded)
+GET /api/policies/3                     → single funded/paid policy, correct
+GET /api/policies/3/ledger              → full 6-entry chronological ledger for the
+                                            paid policy, ending "Paid — ₹1,000 reached
+                                            you because rainfall was 10mm, below your
+                                            20mm threshold" — cites real numbers, zero
+                                            banned vocabulary
+GET /api/policies/1/ledger              → disagreement policy's ledger correctly reads
+                                            "The two weather sources disagreed. No
+                                            payout was made on disputed data."
+GET /api/policies/3/verify              → raw contract address, block numbers, tx
+                                            hashes, event payloads (bigints as strings)
+GET /api/policies/999                   → 404 "Policy not found"
+GET /api/policies/abc                   → 400 "id must be a positive integer"
+GET /api/policies?limit=99999           → capped to 100 (MAX_LIMIT), not unbounded
+npm run typecheck (root)                → clean
+npm test (root, contracts)              → 23 passing, unaffected
+```
+
+### Documentation
+
+| File | Purpose |
+|---|---|
+| `docs/PRD.md` | Product requirements |
+| `docs/TRD.md` | Technical requirements, contract specification |
+| `docs/UserFlows.md` | Journeys, decision trees, edge cases |
+| `docs/Design.md` | Design system, component inventory |
+| `docs/Schema.md` | Canonical data model, on-chain and off-chain |
+| `docs/ImplementationPlan.md` | Phased task breakdown |
+| `docs/AgentRules.md` | Operating rules |
+| `TRACKER.md` | This file |
+
 ### Pre-existing, untouched
 
-`backend/`, `frontend/` in full; `README.md`; `docs/PS3-context-for-claude-code.md`; `docs/phase0.md`; `docs/handoff.md`; `docs/README.md`.
+`frontend/` in full (its P6-affecting rewire — dropping `PostComposer`/`PostList`, adding the router — is P7 scope); `README.md`; `docs/PS3-context-for-claude-code.md`; `docs/phase0.md`; `docs/handoff.md`; `docs/README.md`.
 
 ## Features Implemented
 
-**CF1–CF4 and CF8 complete, verified live end-to-end.** Policy registry, oracle registration/submission, multi-oracle consensus, automatic trigger evaluation and payout, and the oracle simulation harness driving all three demo scenarios through real HTTP calls against a real deployed contract. The `WeatherSource` adapter interface means the harness has no Supabase-specific code in it. Nothing wired into farmer-facing HTTP routes yet — `posts.ts`/`index.ts` still serve the old `MessageBoard` shape; that rewire is P6.
+**CF1–CF4, CF5 (backend half), and CF8 complete, verified live end-to-end.** Policy registry, oracle registration/submission, multi-oracle consensus, automatic trigger evaluation and payout, the oracle simulation harness, and — new this phase — the plain-language claim ledger itself, reconstructed live from real chain events with zero banned vocabulary. `MessageBoard`'s last two files (`posts.ts`, `chain.ts`) are gone. The frontend has not been touched — it still imports the old post-board components and will 404 against `/api/posts` until P7 rewires it; that is the correct, scoped state of this checkpoint, not a regression.
 
 ## Features Remaining
 
@@ -407,7 +464,7 @@ Against [PRD.md](./docs/PRD.md) core features:
 | CF2 | Registered-oracle data submission | P1–P2 | **Complete** |
 | CF3 | Multi-oracle consensus | P2 | **Complete** |
 | CF4 | Automatic trigger evaluation and payout | P2–P3 | **Complete — M1 verified live** |
-| CF5 | Plain-language claim ledger | P6–P7 | Not started |
+| CF5 | Plain-language claim ledger | P6–P7 | Backend complete (P6) — API returns full jargon-free ledgers; farmer-facing UI to render them is P7 |
 | CF6 | Wallet-free farmer access | P7 | Not started |
 | CF7 | Insurer admin console | P8 | Not started |
 | CF8 | Oracle simulation harness | P5 | **Complete — M2 verified live, all 3 scenarios** |
@@ -421,6 +478,8 @@ Every core feature has at least one implementing task — verified during T0.9.
 | `evaluatePolicy` compared `periodId` (days-since-epoch) directly against `startDate`/`endDate` (Unix seconds) — a unit-scale mismatch | P2, before compile | Convert `periodId * 1 days` before comparing — **D19** |
 | Supabase `anon` role had RLS policies but no table-level `GRANT` — every query returned "permission denied" | P4, during verification (live query against real DB) | Added explicit `grant select, insert, update, delete ... to anon` in `schema.sql`, applied to the live project |
 | Oracle harness: fresh `ethers.Wallet` per call + concurrent (`Promise.all`) submissions caused "nonce has already been used" when evaluation reused the feed_a address right after | P5, during first live simulate call | Long-lived per-address wallets + sequential submission — **D21** |
+| `explain.ts` rendered a 1 ETH payout as "₹1" — Design.md's own worked example implies 1 ETH = ₹1,000, not 1:1 | P6, during live ledger verification | Named constant `ETH_TO_RUPEES = 1_000` — **D22** |
+| `summarize()` passed a raw `blockNumber` to a date formatter expecting Unix seconds | P6, caught by re-reading before executing, not by a failed test | `getPolicyEvents` now resolves and attaches a real `blockTimestamp` to every event — **D23** |
 
 Known scaffold issues carried over from [docs/handoff.md](./docs/handoff.md), for awareness rather than action:
 
@@ -436,21 +495,26 @@ Known scaffold issues carried over from [docs/handoff.md](./docs/handoff.md), fo
 | `periodId`/date unit-scale mismatch in `evaluatePolicy` (see Bugs Found) | P2, before compile — never shipped |
 | Supabase `anon` missing `GRANT`s (see Bugs Found) | P4, before this phase was reported complete |
 | Oracle harness nonce race (see Bugs Found) | P5, before this phase was reported complete — confirmed fixed by re-running the exact failing call |
+| ETH→₹ conversion rate (see Bugs Found) | P6, before this phase was reported complete — confirmed fixed against the live ledger |
+| `summarize()` block-number-as-timestamp (see Bugs Found) | P6, before it was ever exercised against live data |
 
 ## Next Actions
 
-**P5 is complete, M2 reached, and stopped for review (Rule 16). Awaiting confirmation before P6 begins.**
+**P6 is complete and stopped for review (Rule 16). Awaiting confirmation before P7 begins.**
 
-P6 — Backend explanation and policy API (T3.1–T3.6), no new credentials needed:
+P7 — Farmer transparent claim ledger UI, **M3 checkpoint** (T3.7–T3.17), no new credentials needed:
 
-1. **T3.1** — `services/explain.ts`: event stream → plain language, all six `PayoutRejected` reason codes, unit conversion (real mm/₹, never a scaled integer)
-2. **T3.2** — unit tests: every reject code produces jargon-free text citing real numbers
-3. **T3.3** — `routes/policies.ts` replaces `routes/posts.ts`: `GET /api/policies` (paginated), `GET /api/policies/:id`
-4. **T3.4** — `GET /api/policies/:id/ledger` — chronological explained decision history from chain events
-5. **T3.5** — `GET /api/policies/:id/verify` — raw on-chain proof payload
-6. **T3.6** — `index.ts` mounts the new policy/oracle routers, drops `posts.ts`
+1. **T3.7** — add `react-router-dom`; convert `App.tsx` to a route shell with `BrowserRouter` in `main.tsx`
+2. **T3.8** — delete `PostComposer.tsx`/`PostList.tsx`; update `lib/api.ts`/`lib/contract.ts` to domain types
+3. **T3.9–T3.10** — design tokens (light/dark) and shared components (`Card`, `Button`, `Badge`, `Money`, `Measurement`, ...)
+4. **T3.11–T3.14** — `StatusBanner`, `PolicyTermsCard`, `ThresholdMeter`, `ClaimLedger`/`LedgerEntry`, `VerifyPanel`, `HowThisWorks`
+5. **T3.15** — `/policy/:id` page and `/` landing with `PolicyLookup`
+6. **T3.16** — route-level code splitting; confirm wagmi/RainbowKit are absent from the farmer bundle
+7. **T3.17 — Checkpoint M3** — open `/policy/1` in a browser **with no wallet extension installed**; verify full render across all three scenarios
 
-This is where `chain.ts` (MessageBoard) and `posts.ts` finally get removed — the app has been carrying both the old and new services side by side since P4 so nothing broke mid-phase; P6 is the cutover.
+This is the largest remaining phase by task count. If it overruns, the first cuts are T3.5/T3.14 (`VerifyPanel`) — the backend `/verify` route stays, only its UI panel is deferred. The ledger itself is never cut.
+
+P8 (T4.1–T4.13, insurer console and polish, M4) does not begin until P7 is reviewed and confirmed.
 
 P7 (T3.7–T3.17, farmer UI, M3 checkpoint) does not begin until P6 is reviewed and confirmed.
 

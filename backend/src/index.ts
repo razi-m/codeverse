@@ -1,9 +1,8 @@
 import cors from "cors";
 import express from "express";
 import { config } from "./config.js";
-import { postsRouter } from "./routes/posts.js";
+import { policiesRouter } from "./routes/policies.js";
 import { oracleRouter } from "./routes/oracle.js";
-import * as chain from "./services/chain.js";
 import * as insurance from "./services/insurance.js";
 import { isSupabaseConfigured, getOracleSources } from "./services/supabase.js";
 
@@ -13,7 +12,7 @@ app.use(cors({ origin: config.corsOrigin }));
 app.use(express.json());
 
 app.get("/api/health", async (_req, res) => {
-  const contract = chain.contractInfo();
+  const contract = insurance.contractInfo();
 
   // Supabase reachability (T2.8): a real query, not just "is it configured" —
   // config can be present while the project is unreachable.
@@ -28,7 +27,7 @@ app.get("/api/health", async (_req, res) => {
   }
 
   try {
-    const status = await chain.getChainStatus();
+    const status = await insurance.getChainStatus();
     res.json({
       ok: true,
       contract,
@@ -50,7 +49,7 @@ app.get("/api/health", async (_req, res) => {
   }
 });
 
-app.use("/api/posts", postsRouter);
+app.use("/api/policies", policiesRouter);
 // GET /api/oracles (T2.9) and POST /api/oracles/simulate (T2.7) share one router.
 app.use("/api/oracles", oracleRouter);
 
@@ -63,7 +62,7 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 
 app.listen(config.port, () => {
   console.log(`API listening on http://localhost:${config.port}`);
-  if (!chain.isConfigured()) {
-    console.warn("No deployment.json yet — deploy the contract to enable /api/posts");
+  if (!insurance.isConfigured()) {
+    console.warn("No deployment.json yet — deploy the contract to enable /api/policies");
   }
 });

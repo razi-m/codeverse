@@ -156,3 +156,68 @@ export async function getChainStatus() {
   ]);
   return { blockNumber, chainId: Number(network.chainId), rpcUrl: config.rpcUrl };
 }
+
+export type PolicyEvent = {
+  name: string; // PolicyCreated, PolicyFunded, ReadingSubmitted, ConsensusReached,
+  // ConsensusFailed, PayoutTriggered, PayoutRejected, PolicyCancelled
+  blockNumber: number;
+  blockTimestamp: number; // unix seconds — not every event carries its own timestamp in args (e.g. PayoutTriggered), so this is the one reliable source explain.ts can render a date from
+  txHash: string;
+  args: Record<string, unknown>; // raw event args, ×100-scaled values NOT yet unscaled — explain.ts does that at render time so it can label which field is which
+};
+
+const POLICY_SCOPED_EVENTS = [
+  "PolicyCreated",
+  "PolicyFunded",
+  "ReadingSubmitted",
+  "ConsensusReached",
+  "ConsensusFailed",
+  "PayoutTriggered",
+  "PayoutRejected",
+  "PolicyCancelled",
+] as const;
+
+/**
+ * The real ledger (D11) — every terminating branch of evaluation emits an
+ * event, so this is reconstructible from logs alone. policyId is indexed
+ * on every one of these events (Schema.md), making this a filtered query
+ * rather than a full chain scan.
+ */
+export async function getPolicyEvents(policyId: number): Promise<PolicyEvent[]> {
+  const c = contract();
+  const perEvent = await Promise.all(
+    POLICY_SCOPED_EVENTS.map(async (name) => {
+      const filter = c.filters[name](policyId);
+      const logs = await c.queryFilter(filter);
+      return logs.map((log) => {
+        const parsed = "args" in log ? log : c.interface.parseLog(log);
+        const args: Record<string, unknown> = {};
+        if (parsed && "args" in parsed && parsed.args) {
+          const fragment = c.interface.getEvent(name);
+          fragment?.inputs.forEach((input, i) => {
+            args[input.name] = (parsed.args as any)[i];
+          });
+        }
+        return { name, blockNumber: log.blockNumber, txHash: log.transactionHash, args };
+      });
+    })
+  );
+
+  const flat = perEvent.flat().sort((a, b) => a.blockNumber - b.blockNumber);
+
+  // One getBlock per unique block, not per event — several events (e.g.
+  // ConsensusReached + PayoutTriggered) usually land in the same block.
+  const uniqueBlocks = [...new Set(flat.map((e) => e.blockNumber))];
+  const timestamps = new Map<number, number>();
+  await Promise.all(
+    uniqueBlocks.map(async (blockNumber) => {
+      const block = await provider.getBlock(blockNumber);
+      timestamps.set(blockNumber, block?.timestamp ?? 0);
+    })
+  );
+
+  return flat.map((e) => ({
+    ...e,
+    blockTimestamp: timestamps.get(e.blockNumber) ?? 0,
+  }));
+}

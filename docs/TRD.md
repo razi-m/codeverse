@@ -279,7 +279,7 @@ All routes under `/api`, extending the existing router mounting pattern.
 | GET | `/api/policies/:id/ledger` | none | **The centrepiece.** Chronological plain-language decision history from events |
 | GET | `/api/policies/:id/verify` | none | Raw on-chain proof: contract address, block numbers, transaction hashes, event payloads |
 | GET | `/api/oracles` | none | Registered oracle addresses and last submission time |
-| POST | `/api/oracle/simulate` | dev-only | Drives the demo: submits a reading from one or both simulated feeds |
+| POST | `/api/oracles/simulate` | dev-only | Drives the demo: submits a reading from one or both simulated feeds (built P5 as a sub-path of the oracles router, alongside `GET /api/oracles`, rather than a singular sibling) |
 
 `GET /api/policies/:id` and `/ledger` must succeed with Supabase unreachable, degrading to on-chain data with region identifiers shown raw instead of as friendly names (NFR10). Supabase failure is logged and swallowed, never propagated to a farmer-facing response.
 
