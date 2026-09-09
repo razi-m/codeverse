@@ -10,16 +10,16 @@ Parametric Crop Insurance with Automatic Payout (PS3)
 |---|---|
 | Last updated | 2026-09-09 |
 | Branch | `master` |
-| Last commit | P4 — Supabase and data layer |
+| Last commit | P5 — Oracle harness and scenarios (M2) |
 | Budget | ~15h, solo developer |
 
 ---
 
 ## Project Status
 
-**Phase 0, P1, P2, P3, P4 complete. M1 reached. P4 awaiting review.**
+**Phase 0, P1, P2, P3, P4, P5 complete. M1 and M2 reached. P5 awaiting review.**
 
-Implementation is divided into **eight coding phases (P1–P8)**, each ending at a review gate. P4 is done and stopped per Rule 16 — P5 does not begin without confirmation.
+Implementation is divided into **eight coding phases (P1–P8)**, each ending at a review gate. P5 is done and stopped per Rule 16 — P6 does not begin without confirmation.
 
 All eight Phase 0 deliverables exist, have been cross-reviewed, and are approved. No production code has been written or modified. The repository still contains the original `MessageBoard` scaffold at commit `73cd154`, unchanged.
 
@@ -27,8 +27,8 @@ Per [AgentRules.md](./docs/AgentRules.md) Rule 1, implementation may now begin, 
 
 ## Current Phase
 
-**P0, P1, P2, P3, P4 — complete. M1 reached.**
-**Next: P5 — Oracle harness and scenarios (M2).**
+**P0, P1, P2, P3, P4, P5 — complete. M1 and M2 reached.**
+**Next: P6 — Backend explanation and policy API.**
 
 Implementation is structured as **eight coding phases**, each ending at a hard stop for user review ([AgentRules.md](./docs/AgentRules.md) Rule 16). No phase begins without explicit confirmation that the previous one is accepted.
 
@@ -38,8 +38,8 @@ Implementation is structured as **eight coding phases**, each ending at a hard s
 | P1 | Contract foundation and policy lifecycle | T1.1–T1.6 | 1.5h | — | **Complete** |
 | P2 | Consensus, evaluation and payout | T1.7–T1.12 | 2h | — | **Complete** |
 | P3 | Deploy, seed and end-to-end payout | T1.13–T1.15 | 0.5h | M1 | **Complete — M1 reached** |
-| P4 | Supabase and data layer | T2.1–T2.5 | 1.5h | — | **Complete — awaiting review** |
-| P5 | Oracle harness and scenarios | T2.6–T2.10 | 1h | M2 | Not started |
+| P4 | Supabase and data layer | T2.1–T2.5 | 1.5h | — | **Complete** |
+| P5 | Oracle harness and scenarios | T2.6–T2.10 | 1h | M2 | **Complete — M2 reached** |
 | P6 | Backend explanation and policy API | T3.1–T3.6 | 1.5h | — | Not started |
 | P7 | Farmer transparent claim ledger UI | T3.7–T3.17 | 2h | M3 | Not started |
 | P8 | Insurer console and polish | T4.1–T4.13 | 3.5h | M4 | Not started |
@@ -48,13 +48,13 @@ Implementation is structured as **eight coding phases**, each ending at a hard s
 |---|---|---|---|
 | M0 Planning complete | **Complete** | 0h | end of P0 |
 | M1 Contract pays out | **Complete** | ~5h | end of P3 |
-| M2 Oracle simulation drives it | Not started | ~7.5h | end of P5 |
+| M2 Oracle simulation drives it | **Complete** | ~7.5h | end of P5 |
 | M3 Farmer can read the ledger | Not started | ~11h | end of P7 |
 | M4 Demo-ready | Not started | ~14.5h | end of P8 |
 
 ## Active Task
 
-**None — P4 complete, stopped for review per Rule 16.** P5 (T2.6–T2.10: oracle harness, M2 checkpoint) is next, and will not start without explicit confirmation.
+**None — P5 complete, M2 reached, stopped for review per Rule 16.** P6 (T3.1–T3.6: `explain.ts`, policy/ledger API) is next, and will not start without explicit confirmation.
 
 ## Completed Tasks
 
@@ -124,12 +124,12 @@ Timeboxed per **TR4** — 45 minutes for T2.1–T2.3, then fall back to the in-m
 
 | ID | Description | Priority | Dependency | Status |
 |---|---|---|---|---|
-| T2.6 | Build oracle harness — two signers, scaling | Must | T2.3, T2.5 | Not started |
-| T2.6a | Data-source adapter interface — `WeatherSource.fetchReading()`, Supabase as default impl, so IMD/Sentinel can swap in later without touching the contract or notification pipeline (user instruction, 2026-09-09) | Must | T2.6 | Not started |
-| T2.7 | Add `POST /api/oracle/simulate` | Must | T2.6a | Not started |
-| T2.8 | Extend `GET /api/health` | Should | T2.4 | Not started |
-| T2.9 | Add `GET /api/oracles` | Should | T2.5 | Not started |
-| T2.10 | **Checkpoint M2** — all scenarios; Supabase-down verified | Must | T2.7 | Not started |
+| T2.6 | Build oracle harness — two signers, scaling | Must | T2.3, T2.5 | Complete |
+| T2.6a | Data-source adapter interface — `WeatherSource.fetchReading()`, Supabase as default impl, so IMD/Sentinel can swap in later without touching the contract or notification pipeline (user instruction, 2026-09-09) | Must | T2.6 | Complete |
+| T2.7 | Add `POST /api/oracle/simulate` | Must | T2.6a | Complete |
+| T2.8 | Extend `GET /api/health` | Should | T2.4 | Complete |
+| T2.9 | Add `GET /api/oracles` | Should | T2.5 | Complete |
+| T2.10 | **Checkpoint M2** — all scenarios; Supabase-down verified | Must | T2.7 | Complete |
 
 ### P6 — Backend explanation and policy API (~1.5h)
 
@@ -230,6 +230,7 @@ Watch items, not yet blocking:
 | D18 | **No celebratory animation on payout** | A payout means a crop failed. The moment gets clarity and dignity, not confetti |
 | D19 | `evaluatePolicy` converts `periodId` (days-since-epoch) to seconds — `periodId * 1 days` — before comparing against `startDate`/`endDate` (Unix seconds) | Caught before compile in P2: comparing the two directly would have been exactly the scale-mismatch bug class D7/TR3 exists to prevent. Schema.md defines `periodId` as days-since-epoch but `startDate`/`endDate` as Unix seconds — the two were never given a common unit until now |
 | D20 | Supabase accessed via the **anon key with a permissive per-table policy**, not `service_role` with no anonymous policy as Schema.md specifies | User instruction (2026-09-09): `service_role` key not available this session. What's preserved: the browser still never receives any Supabase key — the anon key lives only in `backend/.env`, exactly where `service_role` would have. What's weakened: if the anon key leaked, it would grant read/write on these tables, where a leaked `service_role` key would be no worse. Acceptable for a hackathon demo on non-authoritative (D1) data with no real farmer PII; revisit — swap to `service_role`, drop the policies — before any non-demo use. Documented at the top of `backend/sql/schema.sql` |
+| D21 | Oracle harness wallets are **long-lived module-level instances**, one per oracle index, and the two feed submissions run **sequentially, never `Promise.all`** | Found during P5 verification: re-instantiating `ethers.Wallet` per call and submitting concurrently caused a real "nonce has already been used" failure — evaluation reused the feed_a wallet right after a concurrent submission from that same wallet raced its own pending-nonce read. Fixed by caching one `Wallet` per address and awaiting each chain-writing call in turn |
 
 ### Gaps found during T0.9 review, and their resolutions
 
@@ -332,6 +333,49 @@ Temporary verification scripts (`_p4-smoke-test.ts`, `_p4-degrade-test.ts`) were
 
 **Credential handling:** the Supabase DB password (used once, for the pooler connection to apply DDL) was passed only as a shell environment variable in this session and never written to any file; the one-off `pg` script and its `node_modules` were deleted from the scratchpad after use. The long-lived credential — the anon key — lives only in `backend/.env`, which is gitignored (confirmed via `git check-ignore` before writing it).
 
+### P5 — Oracle harness and scenarios (M2)
+
+| File | Change |
+|---|---|
+| `backend/src/services/weatherSource.ts` | **Created.** `WeatherSource` interface (T2.6a) — `fetchReading(regionId, periodId, sourceKey)`. The harness depends only on this; nothing downstream knows Supabase, or any specific provider, exists |
+| `backend/src/services/supabaseWeatherSource.ts` | **Created.** `SupabaseWeatherSource implements WeatherSource` — the default adapter, scenario-parameterized. A future `ImdRainfallSource`/`SentinelVegetationSource` (P9) implements the same interface, unseen by the harness |
+| `backend/src/services/oracleHarness.ts` | **Created.** `submitFromFeed` (one feed, one reading, via a `WeatherSource`) and `runScenario` (both feeds + `evaluatePolicy`). Long-lived per-address wallets derived from Hardhat's well-known local mnemonic (`ORACLE_A_KEY`/`ORACLE_B_KEY` env override for non-local use) |
+| `backend/src/routes/oracle.ts` | **Created.** `POST /api/oracles/simulate` (T2.7, body: `policyId`, `scenario`, optional `periodId`) and `GET /api/oracles` (T2.9, optional `?policyId&periodId` for per-reading submission status) |
+| `backend/src/index.ts` | `/api/health` extended (T2.8) with `oracles.registeredCount` and `supabase.{configured,reachable}` (a real query, not just presence of config); mounts `oracleRouter` at `/api/oracles` |
+
+**Real bug found and fixed during verification — D21:** the first live test of `/api/oracles/simulate` failed with "nonce has already been used". Root cause: `submitFromFeed` created a fresh `ethers.Wallet` per call and submitted both feeds concurrently (`Promise.all`); `runScenario`'s evaluation step then reused the feed_a address's wallet immediately after, racing that address's own in-flight nonce. Fixed by caching one long-lived `Wallet` instance per oracle address and running the two submissions sequentially rather than in parallel. Confirmed fixed by re-running the failing case.
+
+Verified by execution — real Hardhat node, real deployed contract, real HTTP calls, not mocked:
+
+```
+Fresh deploy + seed (policy 1, Active)     → confirmed via /api/health (2 oracles registered)
+POST /api/oracles/simulate {policyId:1,
+  scenario:"disagreement"}                 → both feeds submitted (5mm, 30mm); evaluation:
+                                              on-chain event ConsensusFailed(spread=2500,
+                                              tolerance=500), PayoutRejected(reasonCode=3);
+                                              policy 1 still Active
+2 more policies created (2, 3)
+POST .../simulate {policyId:2,"baseline"}  → 34mm/36mm submitted; PayoutRejected(reasonCode=1,
+                                              threshold not breached); policy 2 still Active
+POST .../simulate {policyId:3,"drought"}   → 9mm/11mm submitted; PayoutTriggered(amount=1.0 ETH);
+                                              policy 3 status PaidOut
+                                            → all three scenarios independently confirmed via
+                                              on-chain event query, not just the HTTP response
+T2.10 Supabase-unreachable check:
+  SUPABASE_URL pointed at a nonexistent host, backend restarted
+  /api/health                              → supabase.reachable:false, chain/oracles unaffected
+  POST .../simulate (fresh periodId)       → both feeds report "no reading available" (correct
+                                              degrade, no crash); evaluatePolicy still runs and
+                                              correctly emits PayoutRejected(reasonCode=2,
+                                              insufficient readings) — the payout path is provably
+                                              independent of Supabase (D1)
+  Supabase config restored, verified via /api/health → reachable:true again
+npm run typecheck (root)                   → clean
+npm test (root)                            → 23 passing, unaffected
+```
+
+**M2 reached.** All three demo scenarios are reproducible on command from a cold start, and the payout path is proven to work with Supabase unreachable — "non-authoritative" is now a tested claim, not an assertion.
+
 ### Documentation
 
 | File | Purpose |
@@ -351,7 +395,7 @@ Temporary verification scripts (`_p4-smoke-test.ts`, `_p4-degrade-test.ts`) were
 
 ## Features Implemented
 
-**CF1–CF4 complete, verified live on-chain.** Policy registry, oracle registration/submission, multi-oracle consensus, automatic trigger evaluation and payout. **Off-chain data layer complete** — Supabase schema live with all three demo scenarios seeded, backend can read both chain and off-chain state. Nothing wired into HTTP routes yet — `posts.ts`/`index.ts` still serve the old `MessageBoard` shape; that rewire is P6.
+**CF1–CF4 and CF8 complete, verified live end-to-end.** Policy registry, oracle registration/submission, multi-oracle consensus, automatic trigger evaluation and payout, and the oracle simulation harness driving all three demo scenarios through real HTTP calls against a real deployed contract. The `WeatherSource` adapter interface means the harness has no Supabase-specific code in it. Nothing wired into farmer-facing HTTP routes yet — `posts.ts`/`index.ts` still serve the old `MessageBoard` shape; that rewire is P6.
 
 ## Features Remaining
 
@@ -366,7 +410,7 @@ Against [PRD.md](./docs/PRD.md) core features:
 | CF5 | Plain-language claim ledger | P6–P7 | Not started |
 | CF6 | Wallet-free farmer access | P7 | Not started |
 | CF7 | Insurer admin console | P8 | Not started |
-| CF8 | Oracle simulation harness | P5 | Not started — data layer it depends on (P4) is ready |
+| CF8 | Oracle simulation harness | P5 | **Complete — M2 verified live, all 3 scenarios** |
 
 Every core feature has at least one implementing task — verified during T0.9.
 
@@ -376,6 +420,7 @@ Every core feature has at least one implementing task — verified during T0.9.
 |---|---|---|
 | `evaluatePolicy` compared `periodId` (days-since-epoch) directly against `startDate`/`endDate` (Unix seconds) — a unit-scale mismatch | P2, before compile | Convert `periodId * 1 days` before comparing — **D19** |
 | Supabase `anon` role had RLS policies but no table-level `GRANT` — every query returned "permission denied" | P4, during verification (live query against real DB) | Added explicit `grant select, insert, update, delete ... to anon` in `schema.sql`, applied to the live project |
+| Oracle harness: fresh `ethers.Wallet` per call + concurrent (`Promise.all`) submissions caused "nonce has already been used" when evaluation reused the feed_a address right after | P5, during first live simulate call | Long-lived per-address wallets + sequential submission — **D21** |
 
 Known scaffold issues carried over from [docs/handoff.md](./docs/handoff.md), for awareness rather than action:
 
@@ -390,21 +435,24 @@ Known scaffold issues carried over from [docs/handoff.md](./docs/handoff.md), fo
 |---|---|
 | `periodId`/date unit-scale mismatch in `evaluatePolicy` (see Bugs Found) | P2, before compile — never shipped |
 | Supabase `anon` missing `GRANT`s (see Bugs Found) | P4, before this phase was reported complete |
+| Oracle harness nonce race (see Bugs Found) | P5, before this phase was reported complete — confirmed fixed by re-running the exact failing call |
 
 ## Next Actions
 
-**P4 is complete and stopped for review (Rule 16). Awaiting confirmation before P5 begins.**
+**P5 is complete, M2 reached, and stopped for review (Rule 16). Awaiting confirmation before P6 begins.**
 
-P5 — Oracle harness and scenarios, **M2 checkpoint** (T2.6–T2.10, including the new **T2.6a** adapter interface — user instruction, 2026-09-09), no new credentials needed:
+P6 — Backend explanation and policy API (T3.1–T3.6), no new credentials needed:
 
-1. **T2.6** — oracle harness: reads `weather_feed` via `supabase.ts`, scales ×100, submits from the two registered oracle signer keys
-2. **T2.6a** — `WeatherSource` adapter interface: extract the harness's data read behind `fetchReading(regionId, periodId)`; Supabase becomes the default implementation rather than a hardcoded call site, so a real IMD/Sentinel adapter later is a config swap, not a rewrite
-3. **T2.7** — `POST /api/oracle/simulate` — scenario and feed selection for demo control
-4. **T2.8** — extend `GET /api/health` with oracle registration and Supabase reachability
-5. **T2.9** — `GET /api/oracles` — registered feeds with last-submission time
-6. **T2.10 — Checkpoint M2** — all three scenarios reproducible from a cold start; payout path verified working **with Supabase unreachable** (already proven possible at the service layer in P4 — T2.10 proves it through the full harness)
+1. **T3.1** — `services/explain.ts`: event stream → plain language, all six `PayoutRejected` reason codes, unit conversion (real mm/₹, never a scaled integer)
+2. **T3.2** — unit tests: every reject code produces jargon-free text citing real numbers
+3. **T3.3** — `routes/policies.ts` replaces `routes/posts.ts`: `GET /api/policies` (paginated), `GET /api/policies/:id`
+4. **T3.4** — `GET /api/policies/:id/ledger` — chronological explained decision history from chain events
+5. **T3.5** — `GET /api/policies/:id/verify` — raw on-chain proof payload
+6. **T3.6** — `index.ts` mounts the new policy/oracle routers, drops `posts.ts`
 
-P6 (T3.1–T3.6, `explain.ts` and policy API) does not begin until P5 is reviewed and confirmed.
+This is where `chain.ts` (MessageBoard) and `posts.ts` finally get removed — the app has been carrying both the old and new services side by side since P4 so nothing broke mid-phase; P6 is the cutover.
+
+P7 (T3.7–T3.17, farmer UI, M3 checkpoint) does not begin until P6 is reviewed and confirmed.
 
 Before starting, read [docs/AgentRules.md](./docs/AgentRules.md), [docs/TRD.md](./docs/TRD.md) §Contract Specification, and [docs/Schema.md](./docs/Schema.md) — Schema is canonical for every entity and field name.
 
