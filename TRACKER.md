@@ -10,16 +10,16 @@ Parametric Crop Insurance with Automatic Payout (PS3)
 |---|---|
 | Last updated | 2026-09-09 |
 | Branch | `master` |
-| Last commit | P1 — Contract foundation and policy lifecycle |
+| Last commit | P2 — Consensus, evaluation and payout |
 | Budget | ~15h, solo developer |
 
 ---
 
 ## Project Status
 
-**Phase 0 complete. P1 complete, awaiting review.**
+**Phase 0, P1, P2 complete. P2 awaiting review.**
 
-Implementation is divided into **eight coding phases (P1–P8)**, each ending at a review gate. P1 is done and stopped per Rule 16 — P2 does not begin without confirmation.
+Implementation is divided into **eight coding phases (P1–P8)**, each ending at a review gate. P2 is done and stopped per Rule 16 — P3 does not begin without confirmation.
 
 All eight Phase 0 deliverables exist, have been cross-reviewed, and are approved. No production code has been written or modified. The repository still contains the original `MessageBoard` scaffold at commit `73cd154`, unchanged.
 
@@ -27,8 +27,8 @@ Per [AgentRules.md](./docs/AgentRules.md) Rule 1, implementation may now begin, 
 
 ## Current Phase
 
-**P0 — Planning and documentation** → complete.
-**Next: P1 — Contract foundation and policy lifecycle.**
+**P0, P1, P2 — complete.**
+**Next: P3 — Deploy, seed and end-to-end payout (M1).**
 
 Implementation is structured as **eight coding phases**, each ending at a hard stop for user review ([AgentRules.md](./docs/AgentRules.md) Rule 16). No phase begins without explicit confirmation that the previous one is accepted.
 
@@ -36,7 +36,7 @@ Implementation is structured as **eight coding phases**, each ending at a hard s
 |---|---|---|---|---|---|
 | P0 | Planning and documentation | T0.1–T0.9 | 1h | M0 | **Complete** |
 | P1 | Contract foundation and policy lifecycle | T1.1–T1.6 | 1.5h | — | **Complete — awaiting review** |
-| P2 | Consensus, evaluation and payout | T1.7–T1.12 | 2h | — | Not started |
+| P2 | Consensus, evaluation and payout | T1.7–T1.12 | 2h | — | **Complete — awaiting review** |
 | P3 | Deploy, seed and end-to-end payout | T1.13–T1.15 | 0.5h | M1 | Not started |
 | P4 | Supabase and data layer | T2.1–T2.5 | 1.5h | — | Not started |
 | P5 | Oracle harness and scenarios | T2.6–T2.10 | 1h | M2 | Not started |
@@ -54,7 +54,7 @@ Implementation is structured as **eight coding phases**, each ending at a hard s
 
 ## Active Task
 
-**None — P1 complete, stopped for review per Rule 16.** P2 (T1.7–T1.12: consensus, evaluatePolicy, tests) is next, and will not start without explicit confirmation.
+**None — P2 complete, stopped for review per Rule 16.** P3 (T1.13–T1.15: deploy, seed, M1 checkpoint) is next, and will not start without explicit confirmation.
 
 ## Completed Tasks
 
@@ -93,12 +93,12 @@ Every arithmetic decision that can misdirect money. Note **D8** (strictly below)
 
 | ID | Description | Priority | Dependency | Status |
 |---|---|---|---|---|
-| T1.7 | Implement `submitReading` with duplicate guard | Must | T1.6 | Not started |
-| T1.8 | Implement consensus — spread, tolerance, mean | Must | T1.7 | Not started |
-| T1.9 | Implement `evaluatePolicy` — all six reject codes, payout | Must | T1.8 | Not started |
-| T1.10 | Implement `cancelPolicy` with refund | Should | T1.5 | Not started |
-| T1.11 | Implement view functions | Must | T1.9 | Not started |
-| T1.12 | Write contract test suite | Must | T1.11 | Not started |
+| T1.7 | Implement `submitReading` with duplicate guard | Must | T1.6 | Complete |
+| T1.8 | Implement consensus — spread, tolerance, mean | Must | T1.7 | Complete |
+| T1.9 | Implement `evaluatePolicy` — all six reject codes, payout | Must | T1.8 | Complete |
+| T1.10 | Implement `cancelPolicy` with refund | Should | T1.5 | Complete |
+| T1.11 | Implement view functions | Must | T1.9 | Complete |
+| T1.12 | Write contract test suite | Must | T1.11 | Complete |
 
 ### P3 — Deploy, seed and end-to-end payout — **M1** (~0.5h)
 
@@ -227,6 +227,7 @@ Watch items, not yet blocking:
 | D16 | **Local Hardhat node only** for the demo | No network dependency, no faucet, no gas, fully reproducible from cold start |
 | D17 | All farmer-facing strings originate in `explain.ts` | Gives the plain-language audit exactly one target file |
 | D18 | **No celebratory animation on payout** | A payout means a crop failed. The moment gets clarity and dignity, not confetti |
+| D19 | `evaluatePolicy` converts `periodId` (days-since-epoch) to seconds — `periodId * 1 days` — before comparing against `startDate`/`endDate` (Unix seconds) | Caught before compile in P2: comparing the two directly would have been exactly the scale-mismatch bug class D7/TR3 exists to prevent. Schema.md defines `periodId` as days-since-epoch but `startDate`/`endDate` as Unix seconds — the two were never given a common unit until now |
 
 ### Gaps found during T0.9 review, and their resolutions
 
@@ -251,7 +252,18 @@ Watch items, not yet blocking:
 | `contracts/package.json` | Added `@openzeppelin/contracts` dependency |
 | `package-lock.json` | Updated by npm install |
 
-Verified by execution: `npx hardhat compile` — clean, 3 files, evm target paris. `npm run typecheck` at root — clean (backend/frontend unaffected, as expected — they don't reference the contract until P2/P4). `npm test` **not run** — no test file exists yet for `CropInsurance.sol`; deferred to T1.12 in P2 by design, not an oversight.
+Verified by execution: `npx hardhat compile` — clean, 3 files, evm target paris. `npm run typecheck` at root — clean.
+
+### P2 — Consensus, evaluation and payout
+
+| File | Change |
+|---|---|
+| `contracts/contracts/CropInsurance.sol` | `submitReading` (registered-oracle only, duplicate-per-period guard via `hasSubmitted`); consensus (spread/tolerance/mean); `evaluatePolicy` (permissionless, all six `PayoutRejected` reason codes, strictly-below trigger — D8, status set before transfer — checks-effects-interactions); new events `ReadingSubmitted`, `ConsensusReached`, `ConsensusFailed`, `PayoutTriggered`, `PayoutRejected`; new errors `DuplicateReading`, `PayoutTransferFailed`. Also fixed a unit-scale bug caught before compile — **D19** |
+| `contracts/contracts/test/RejectingFarmer.sol` | **Created.** Test-only helper contract that reverts on receive, used for the E6 reentrancy-guard test |
+| `contracts/test/CropInsurance.test.js` | **Created.** 23 tests covering every case in TRD §Testing Strategy: policy lifecycle, oracle registration, reading submission, consensus agreement/disagreement/insufficient, trigger met/not-met, the equal-to-threshold boundary (D8), double payout, period bounds, unfunded rejection, permissionless evaluation, and the E6 rejecting-farmer reentrancy case |
+| `docs/TRD.md` | Consensus algorithm pseudocode corrected to show the `periodId`-to-seconds conversion (D19) |
+
+Verified by execution: `npx hardhat test` — **23 passing**, 0 failing. `npm test` at root — same, 23 passing. `npm run typecheck` at root — clean.
 
 ### Documentation
 
@@ -272,7 +284,7 @@ Verified by execution: `npx hardhat compile` — clean, 3 files, evm target pari
 
 ## Features Implemented
 
-**CF1 partially** — on-chain policy registry exists (`createPolicy`, `fundPolicy`, `cancelPolicy`, view functions), and oracle registration exists, but nothing pays out yet: `submitReading` and `evaluatePolicy` are P2. `MessageBoard` is fully removed.
+**CF1 (policy registry) and CF3 (multi-oracle consensus) complete on-chain. CF2 and CF4 complete on-chain.** `submitReading`, consensus (spread/tolerance/mean), and `evaluatePolicy` (all six reject codes, strictly-below trigger, automatic payout) are implemented and pass all 23 tests. `MessageBoard` is fully removed. Nothing off-chain (backend/frontend) yet — that starts P4.
 
 ## Features Remaining
 
@@ -281,9 +293,9 @@ Against [PRD.md](./docs/PRD.md) core features:
 | ID | Feature | Phase | Status |
 |---|---|---|---|
 | CF1 | On-chain policy registry | P1 | **Complete** |
-| CF2 | Registered-oracle data submission | P1–P2 | P1 done (registration); submission is P2 |
-| CF3 | Multi-oracle consensus | P2 | Not started |
-| CF4 | Automatic trigger evaluation and payout | P2–P3 | Not started |
+| CF2 | Registered-oracle data submission | P1–P2 | **Complete** |
+| CF3 | Multi-oracle consensus | P2 | **Complete** |
+| CF4 | Automatic trigger evaluation and payout | P2–P3 | Contract logic complete; P3 deploys and seeds it live |
 | CF5 | Plain-language claim ledger | P6–P7 | Not started |
 | CF6 | Wallet-free farmer access | P7 | Not started |
 | CF7 | Insurer admin console | P8 | Not started |
@@ -293,7 +305,9 @@ Every core feature has at least one implementing task — verified during T0.9.
 
 ## Bugs Found
 
-**None.** No implementation code exists yet.
+| Bug | Found at | Fix |
+|---|---|---|
+| `evaluatePolicy` compared `periodId` (days-since-epoch) directly against `startDate`/`endDate` (Unix seconds) — a unit-scale mismatch | P2, before compile | Convert `periodId * 1 days` before comparing — **D19** |
 
 Known scaffold issues carried over from [docs/handoff.md](./docs/handoff.md), for awareness rather than action:
 
@@ -304,22 +318,21 @@ Known scaffold issues carried over from [docs/handoff.md](./docs/handoff.md), fo
 
 ## Bugs Fixed
 
-**None.**
+| Bug | Fixed at |
+|---|---|
+| `periodId`/date unit-scale mismatch in `evaluatePolicy` (see Bugs Found) | P2, before compile — never shipped |
 
 ## Next Actions
 
-**P1 is complete and stopped for review (Rule 16). Awaiting confirmation before P2 begins.**
+**P2 is complete and stopped for review (Rule 16). Awaiting confirmation before P3 begins.**
 
-P2 — Consensus, evaluation and payout (T1.7–T1.12), no credentials needed, pure Solidity/Hardhat:
+P3 — Deploy, seed and end-to-end payout, **M1 checkpoint** (T1.13–T1.15), no credentials needed, local Hardhat node only:
 
-1. **T1.7** — `submitReading` with `onlyRegisteredOracle` and duplicate-per-period guard
-2. **T1.8** — consensus: spread, tolerance check, mean, `ConsensusReached`/`ConsensusFailed`
-3. **T1.9** — `evaluatePolicy`: permissionless, all six reject codes, strictly-below trigger, status-before-transfer payout
-4. **T1.10** — `cancelPolicy` refund (already implemented in P1, ahead of schedule — will confirm still correct)
-5. **T1.11** — remaining view functions (already implemented in P1)
-6. **T1.12** — full contract test suite including the equal-to-threshold boundary and reentrancy case
+1. **T1.13** — update `contracts/scripts/deploy.js` to deploy `CropInsurance` instead of `MessageBoard`; confirm both `deployment.json` files are written
+2. **T1.14** — write `contracts/scripts/seed.js`: register two oracles, create and fund the demo policy
+3. **T1.15 — Checkpoint M1** — deploy to a local node, run seed, submit two agreeing sub-threshold readings, call `evaluatePolicy`, confirm the farmer's balance increases by exactly the coverage amount, by execution
 
-P3 (T1.13–T1.15, deploy/seed/M1 checkpoint) does not begin until P2 is reviewed and confirmed.
+P4 (T2.1–T2.5, Supabase and data layer) does not begin until P3 is reviewed and confirmed. **P4 is where the first credential is needed** — a Supabase project URL and anon key; I'll ask for it at the start of that phase, not before.
 
 Before starting, read [docs/AgentRules.md](./docs/AgentRules.md), [docs/TRD.md](./docs/TRD.md) §Contract Specification, and [docs/Schema.md](./docs/Schema.md) — Schema is canonical for every entity and field name.
 

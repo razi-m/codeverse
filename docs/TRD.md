@@ -234,7 +234,7 @@ consensusValue ← mean(values)
 emit ConsensusReached(consensusValue, spread)
 
 if policy.status ≠ Active                 → PayoutRejected(4); stop
-if periodId outside [startDate, endDate]  → PayoutRejected(5); stop
+if periodId·1days outside [startDate, endDate]  → PayoutRejected(5); stop   // periodId is days-since-epoch; dates are Unix seconds — D19
 if not policy.funded                      → PayoutRejected(6); stop
 
 triggered ← consensusValue < policy.thresholdValue     // both trigger types are "below"

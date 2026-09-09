@@ -59,6 +59,29 @@ contract CropInsurance is Ownable {
     event OracleRegistered(address indexed oracle);
     event OracleDeregistered(address indexed oracle);
     event PolicyCancelled(uint256 indexed policyId);
+    event ReadingSubmitted(
+        uint256 indexed policyId,
+        address indexed oracle,
+        uint256 value,
+        uint64 periodId,
+        uint64 submittedAt
+    );
+    event ConsensusReached(uint256 indexed policyId, uint64 periodId, uint256 consensusValue, uint256 spread);
+    event ConsensusFailed(uint256 indexed policyId, uint64 periodId, uint256 spread, uint256 tolerance);
+    event PayoutTriggered(
+        uint256 indexed policyId,
+        address indexed farmer,
+        uint256 amount,
+        uint256 consensusValue,
+        uint256 thresholdValue
+    );
+    event PayoutRejected(
+        uint256 indexed policyId,
+        uint64 periodId,
+        uint8 reasonCode,
+        uint256 consensusValue,
+        uint256 thresholdValue
+    );
 
     error InvalidFarmer();
     error EmptyCropType();
@@ -74,6 +97,8 @@ contract CropInsurance is Ownable {
     error OracleNotRegistered(address oracle);
     error NotActive(uint256 policyId);
     error RefundFailed();
+    error DuplicateReading(uint256 policyId, uint64 periodId, address oracle);
+    error PayoutTransferFailed();
 
     modifier onlyRegisteredOracle() {
         if (!registeredOracles[msg.sender]) revert OracleNotRegistered(msg.sender);
@@ -178,6 +203,103 @@ contract CropInsurance is Ownable {
         }
 
         emit OracleDeregistered(oracle);
+    }
+
+    /// @notice Records one oracle's reading for a policy/period. One reading
+    ///         per oracle per period — a second submission would let a single
+    ///         feed manufacture agreement with itself.
+    function submitReading(
+        uint256 policyId,
+        uint256 value,
+        uint64 periodId
+    ) external onlyRegisteredOracle {
+        if (policies[policyId].id == 0) revert PolicyNotFound(policyId);
+        if (hasSubmitted[policyId][periodId][msg.sender]) {
+            revert DuplicateReading(policyId, periodId, msg.sender);
+        }
+
+        hasSubmitted[policyId][periodId][msg.sender] = true;
+        readings[policyId][periodId].push(
+            Reading({
+                policyId: policyId,
+                oracle: msg.sender,
+                value: value,
+                periodId: periodId,
+                submittedAt: uint64(block.timestamp)
+            })
+        );
+
+        emit ReadingSubmitted(policyId, msg.sender, value, periodId, uint64(block.timestamp));
+    }
+
+    /// @notice Runs consensus and trigger evaluation for a policy/period, and
+    ///         pays out when satisfied. Deliberately permissionless (D6) — an
+    ///         insurer who alone could call this could suppress a payout by
+    ///         simply never calling. Every terminating branch emits an event;
+    ///         nothing reverts, so a farmer can be shown why they were or
+    ///         were not paid (D10).
+    function evaluatePolicy(uint256 policyId, uint64 periodId) external {
+        Policy storage policy = policies[policyId];
+        if (policy.id == 0) revert PolicyNotFound(policyId);
+
+        Reading[] storage periodReadings = readings[policyId][periodId];
+        if (periodReadings.length < 2) {
+            emit PayoutRejected(policyId, periodId, 2, 0, policy.thresholdValue);
+            return;
+        }
+
+        uint256 minValue = periodReadings[0].value;
+        uint256 maxValue = periodReadings[0].value;
+        uint256 sum = periodReadings[0].value;
+        for (uint256 i = 1; i < periodReadings.length; i++) {
+            uint256 v = periodReadings[i].value;
+            if (v < minValue) minValue = v;
+            if (v > maxValue) maxValue = v;
+            sum += v;
+        }
+        uint256 spread = maxValue - minValue;
+
+        if (spread > policy.toleranceValue) {
+            emit ConsensusFailed(policyId, periodId, spread, policy.toleranceValue);
+            emit PayoutRejected(policyId, periodId, 3, 0, policy.thresholdValue);
+            return;
+        }
+
+        uint256 consensusValue = sum / periodReadings.length;
+        emit ConsensusReached(policyId, periodId, consensusValue, spread);
+
+        if (policy.status != PolicyStatus.Active) {
+            emit PayoutRejected(policyId, periodId, 4, consensusValue, policy.thresholdValue);
+            return;
+        }
+        // periodId is days-since-epoch (docs/Schema.md); startDate/endDate are
+        // Unix seconds. Convert before comparing so the two share a unit.
+        uint256 periodSeconds = uint256(periodId) * 1 days;
+        if (periodSeconds < policy.startDate || periodSeconds > policy.endDate) {
+            emit PayoutRejected(policyId, periodId, 5, consensusValue, policy.thresholdValue);
+            return;
+        }
+        if (!policy.funded) {
+            emit PayoutRejected(policyId, periodId, 6, consensusValue, policy.thresholdValue);
+            return;
+        }
+
+        if (consensusValue >= policy.thresholdValue) {
+            emit PayoutRejected(policyId, periodId, 1, consensusValue, policy.thresholdValue);
+            return;
+        }
+
+        // Checks-effects-interactions: status is set before the transfer so
+        // a farmer address that is a rejecting/reentering contract cannot
+        // reopen this path.
+        policy.status = PolicyStatus.PaidOut;
+        uint256 amount = policy.coverageAmount;
+        address farmer = policy.farmer;
+
+        emit PayoutTriggered(policyId, farmer, amount, consensusValue, policy.thresholdValue);
+
+        (bool ok, ) = payable(farmer).call{value: amount}("");
+        if (!ok) revert PayoutTransferFailed();
     }
 
     function getPolicy(uint256 policyId) external view returns (Policy memory) {
