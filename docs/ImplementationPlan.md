@@ -148,12 +148,19 @@ Two independent feeds submitting from distinct addresses — the multi-oracle co
 | ID | Description | Priority | Dependency | Status |
 |---|---|---|---|---|
 | T2.6 | Build oracle harness: reads `weather_feed`, scales ×100, submits from distinct oracle keys | Must | T2.3, T2.5 | Not started |
+| T2.6a | **Data-source adapter interface** — extract the harness's data read into a `WeatherSource` interface (`fetchReading(regionId, periodId): { value, scenario }`); the Supabase-backed implementation becomes the default adapter, not a hardcoded call site | Must | T2.6 | Not started |
 | T2.7 | Add `POST /api/oracle/simulate` — scenario and feed selection for demo control | Must | T2.6 | Not started |
 | T2.8 | Extend `GET /api/health` with oracle registration and Supabase reachability | Should | T2.4 | Not started |
 | T2.9 | Add `GET /api/oracles` — registered feeds with last-submission time | Should | T2.5 | Not started |
 | T2.10 | **Checkpoint:** all three scenarios reproducible from a cold start; verify payout path works with Supabase unreachable; update tracker | Must | T2.7 | Not started |
 
 **Exit criteria (M2):** all three scenarios — baseline, drought, disagreement — reproducible on command from a cold start, and the payout path verified working **with Supabase unreachable**. That second check is what makes "non-authoritative" a tested claim rather than an assertion.
+
+**Architecture note recorded 2026-09-09 (user instruction):** once the harness works (T2.6), before moving to T2.7, wrap its data read behind a small adapter interface (T2.6a) so simulated rainfall/NDVI data can later be swapped for real IMD (rainfall) or Sentinel (vegetation index) feeds **without changing the smart contract or the notification pipeline**. Concretely:
+
+- The harness calls one function — `fetchReading(regionId, periodId)` — that returns a value already in the on-chain scale (×100) plus which scenario produced it. Everything downstream (scaling, submission, oracle key selection) is unaffected by where the value came from.
+- The Supabase `weather_feed` table read (T2.3) is *an* implementation of that interface, not baked into the harness. A future `ImdRainfallSource` or `SentinelVegetationSource` implements the same interface and is a config swap, not a rewrite.
+- This costs one extra function boundary now; it is what makes "plug in real data later" true rather than aspirational. Recorded here rather than deferred to [P9](#p9--post-mvp-backlog-not-scheduled-not-estimated) because the interface itself is cheap and belongs in the harness from the start — only the *real* IMD/Sentinel adapters are P9 work.
 
 ### P6 — Backend explanation and policy API (~1.5h)
 

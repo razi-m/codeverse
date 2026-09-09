@@ -3,7 +3,7 @@ const path = require("path");
 const hre = require("hardhat");
 
 /**
- * Deploys MessageBoard and syncs the address + ABI into the backend and
+ * Deploys CropInsurance and syncs the address + ABI into the backend and
  * frontend so nobody has to copy-paste an address after a redeploy.
  */
 async function main() {
@@ -12,13 +12,13 @@ async function main() {
 
   console.log(`Deploying with ${deployer.address} on ${hre.network.name} (chainId ${network.chainId})`);
 
-  const board = await hre.ethers.deployContract("MessageBoard");
-  await board.waitForDeployment();
+  const insurance = await hre.ethers.deployContract("CropInsurance");
+  await insurance.waitForDeployment();
 
-  const address = await board.getAddress();
-  console.log(`MessageBoard deployed to ${address}`);
+  const address = await insurance.getAddress();
+  console.log(`CropInsurance deployed to ${address}`);
 
-  const artifact = await hre.artifacts.readArtifact("MessageBoard");
+  const artifact = await hre.artifacts.readArtifact("CropInsurance");
   const deployment = {
     address,
     chainId: Number(network.chainId),

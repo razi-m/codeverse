@@ -10,16 +10,16 @@ Parametric Crop Insurance with Automatic Payout (PS3)
 |---|---|
 | Last updated | 2026-09-09 |
 | Branch | `master` |
-| Last commit | P2 — Consensus, evaluation and payout |
+| Last commit | P3 — Deploy, seed and end-to-end payout (M1) |
 | Budget | ~15h, solo developer |
 
 ---
 
 ## Project Status
 
-**Phase 0, P1, P2 complete. P2 awaiting review.**
+**Phase 0, P1, P2, P3 complete. M1 reached — contract pays out, verified end-to-end on a local node. P3 awaiting review.**
 
-Implementation is divided into **eight coding phases (P1–P8)**, each ending at a review gate. P2 is done and stopped per Rule 16 — P3 does not begin without confirmation.
+Implementation is divided into **eight coding phases (P1–P8)**, each ending at a review gate. P3 is done and stopped per Rule 16 — P4 does not begin without confirmation, and needs a Supabase URL + anon key from the user first.
 
 All eight Phase 0 deliverables exist, have been cross-reviewed, and are approved. No production code has been written or modified. The repository still contains the original `MessageBoard` scaffold at commit `73cd154`, unchanged.
 
@@ -27,17 +27,17 @@ Per [AgentRules.md](./docs/AgentRules.md) Rule 1, implementation may now begin, 
 
 ## Current Phase
 
-**P0, P1, P2 — complete.**
-**Next: P3 — Deploy, seed and end-to-end payout (M1).**
+**P0, P1, P2, P3 — complete. M1 reached.**
+**Next: P4 — Supabase and data layer.**
 
 Implementation is structured as **eight coding phases**, each ending at a hard stop for user review ([AgentRules.md](./docs/AgentRules.md) Rule 16). No phase begins without explicit confirmation that the previous one is accepted.
 
 | Phase | Focus | Tasks | Est. | Milestone | Status |
 |---|---|---|---|---|---|
 | P0 | Planning and documentation | T0.1–T0.9 | 1h | M0 | **Complete** |
-| P1 | Contract foundation and policy lifecycle | T1.1–T1.6 | 1.5h | — | **Complete — awaiting review** |
-| P2 | Consensus, evaluation and payout | T1.7–T1.12 | 2h | — | **Complete — awaiting review** |
-| P3 | Deploy, seed and end-to-end payout | T1.13–T1.15 | 0.5h | M1 | Not started |
+| P1 | Contract foundation and policy lifecycle | T1.1–T1.6 | 1.5h | — | **Complete** |
+| P2 | Consensus, evaluation and payout | T1.7–T1.12 | 2h | — | **Complete** |
+| P3 | Deploy, seed and end-to-end payout | T1.13–T1.15 | 0.5h | M1 | **Complete — M1 reached, awaiting review** |
 | P4 | Supabase and data layer | T2.1–T2.5 | 1.5h | — | Not started |
 | P5 | Oracle harness and scenarios | T2.6–T2.10 | 1h | M2 | Not started |
 | P6 | Backend explanation and policy API | T3.1–T3.6 | 1.5h | — | Not started |
@@ -47,14 +47,14 @@ Implementation is structured as **eight coding phases**, each ending at a hard s
 | Milestone | Status | Est. cumulative | Reached at |
 |---|---|---|---|
 | M0 Planning complete | **Complete** | 0h | end of P0 |
-| M1 Contract pays out | Not started | ~5h | end of P3 |
+| M1 Contract pays out | **Complete** | ~5h | end of P3 |
 | M2 Oracle simulation drives it | Not started | ~7.5h | end of P5 |
 | M3 Farmer can read the ledger | Not started | ~11h | end of P7 |
 | M4 Demo-ready | Not started | ~14.5h | end of P8 |
 
 ## Active Task
 
-**None — P2 complete, stopped for review per Rule 16.** P3 (T1.13–T1.15: deploy, seed, M1 checkpoint) is next, and will not start without explicit confirmation.
+**None — P3 complete, M1 reached, stopped for review per Rule 16.** P4 (T2.1–T2.5: Supabase and data layer) is next, and will not start without explicit confirmation. **P4 needs a Supabase project URL + anon key from the user before it can proceed.**
 
 ## Completed Tasks
 
@@ -104,9 +104,9 @@ Every arithmetic decision that can misdirect money. Note **D8** (strictly below)
 
 | ID | Description | Priority | Dependency | Status |
 |---|---|---|---|---|
-| T1.13 | Update `deploy.js` contract name | Must | T1.3 | Not started |
-| T1.14 | Write `seed.js` — oracles, demo policy, funding | Must | T1.13 | Not started |
-| T1.15 | **Checkpoint M1** — end-to-end payout verified | Must | T1.14 | Not started |
+| T1.13 | Update `deploy.js` contract name | Must | T1.3 | Complete |
+| T1.14 | Write `seed.js` — oracles, demo policy, funding | Must | T1.13 | Complete |
+| T1.15 | **Checkpoint M1** — end-to-end payout verified | Must | T1.14 | **Complete** |
 
 ### P4 — Supabase and data layer (~1.5h)
 
@@ -125,7 +125,8 @@ Timeboxed per **TR4** — 45 minutes for T2.1–T2.3, then fall back to the in-m
 | ID | Description | Priority | Dependency | Status |
 |---|---|---|---|---|
 | T2.6 | Build oracle harness — two signers, scaling | Must | T2.3, T2.5 | Not started |
-| T2.7 | Add `POST /api/oracle/simulate` | Must | T2.6 | Not started |
+| T2.6a | Data-source adapter interface — `WeatherSource.fetchReading()`, Supabase as default impl, so IMD/Sentinel can swap in later without touching the contract or notification pipeline (user instruction, 2026-09-09) | Must | T2.6 | Not started |
+| T2.7 | Add `POST /api/oracle/simulate` | Must | T2.6a | Not started |
 | T2.8 | Extend `GET /api/health` | Should | T2.4 | Not started |
 | T2.9 | Add `GET /api/oracles` | Should | T2.5 | Not started |
 | T2.10 | **Checkpoint M2** — all scenarios; Supabase-down verified | Must | T2.7 | Not started |
@@ -265,6 +266,31 @@ Verified by execution: `npx hardhat compile` — clean, 3 files, evm target pari
 
 Verified by execution: `npx hardhat test` — **23 passing**, 0 failing. `npm test` at root — same, 23 passing. `npm run typecheck` at root — clean.
 
+### P3 — Deploy, seed and end-to-end payout (M1)
+
+| File | Change |
+|---|---|
+| `contracts/scripts/deploy.js` | Deploys `CropInsurance` instead of `MessageBoard`; writes both `deployment.json` files |
+| `contracts/scripts/seed.js` | **Created.** Registers 2 oracles, creates and funds the demo policy (Cotton, MH-VID-04, 20mm threshold, 5mm tolerance, 1 ETH coverage, 30-day window) |
+| `contracts/scripts/verify-payout.js` | **Created.** T1.15 checkpoint smoke test — submits two agreeing sub-threshold readings, calls `evaluatePolicy`, asserts farmer balance +1 ETH, `PayoutTriggered` emitted, status `PaidOut`. Kept as a repeatable smoke test, not part of the demo script |
+
+Verified by execution — real local node, real deploy, real seed, real payout, not inferred:
+
+```
+npm run chain          → local Hardhat node started (chainId 31337)
+npm run deploy          → CropInsurance deployed; both deployment.json written
+seed.js                 → 2 oracles registered, policy 1 created and funded (1 ETH)
+verify-payout.js        → oracleA submits 9mm, oracleB submits 11mm (mean 10mm < 20mm threshold)
+                           evaluatePolicy called → farmer balance +1.0 ETH exactly
+                           PayoutTriggered emitted (amount=1.0 ETH, consensusValue=1000)
+                           policy.status = 1 (PaidOut)
+                         → PASS
+npm test (root)         → 23 passing (unaffected)
+npm run typecheck        → clean
+```
+
+**M1 reached.** This is the first demonstrable product per [ImplementationPlan.md](./docs/ImplementationPlan.md): a funded policy that pays automatically on agreeing sub-threshold readings.
+
 ### Documentation
 
 | File | Purpose |
@@ -284,7 +310,7 @@ Verified by execution: `npx hardhat test` — **23 passing**, 0 failing. `npm te
 
 ## Features Implemented
 
-**CF1 (policy registry) and CF3 (multi-oracle consensus) complete on-chain. CF2 and CF4 complete on-chain.** `submitReading`, consensus (spread/tolerance/mean), and `evaluatePolicy` (all six reject codes, strictly-below trigger, automatic payout) are implemented and pass all 23 tests. `MessageBoard` is fully removed. Nothing off-chain (backend/frontend) yet — that starts P4.
+**CF1–CF4 complete, verified live.** Policy registry, oracle registration/submission, multi-oracle consensus, and automatic trigger evaluation and payout all work end-to-end on a deployed local contract — not just unit-tested. Nothing off-chain (backend/frontend) yet — that starts P4.
 
 ## Features Remaining
 
@@ -295,7 +321,7 @@ Against [PRD.md](./docs/PRD.md) core features:
 | CF1 | On-chain policy registry | P1 | **Complete** |
 | CF2 | Registered-oracle data submission | P1–P2 | **Complete** |
 | CF3 | Multi-oracle consensus | P2 | **Complete** |
-| CF4 | Automatic trigger evaluation and payout | P2–P3 | Contract logic complete; P3 deploys and seeds it live |
+| CF4 | Automatic trigger evaluation and payout | P2–P3 | **Complete — M1 verified live** |
 | CF5 | Plain-language claim ledger | P6–P7 | Not started |
 | CF6 | Wallet-free farmer access | P7 | Not started |
 | CF7 | Insurer admin console | P8 | Not started |
@@ -324,15 +350,19 @@ Known scaffold issues carried over from [docs/handoff.md](./docs/handoff.md), fo
 
 ## Next Actions
 
-**P2 is complete and stopped for review (Rule 16). Awaiting confirmation before P3 begins.**
+**P3 is complete, M1 reached, and stopped for review (Rule 16). Awaiting confirmation before P4 begins.**
 
-P3 — Deploy, seed and end-to-end payout, **M1 checkpoint** (T1.13–T1.15), no credentials needed, local Hardhat node only:
+**P4 needs a credential before it can start:** a Supabase project URL and anon key (create a free project at supabase.com if one doesn't exist yet). I will ask for this at the start of P4 rather than blocking silently.
 
-1. **T1.13** — update `contracts/scripts/deploy.js` to deploy `CropInsurance` instead of `MessageBoard`; confirm both `deployment.json` files are written
-2. **T1.14** — write `contracts/scripts/seed.js`: register two oracles, create and fund the demo policy
-3. **T1.15 — Checkpoint M1** — deploy to a local node, run seed, submit two agreeing sub-threshold readings, call `evaluatePolicy`, confirm the farmer's balance increases by exactly the coverage amount, by execution
+P4 — Supabase and data layer (T2.1–T2.5), timeboxed to 45 minutes for T2.1–T2.3 per **TR4**, with an in-memory fixture fallback if it overruns:
 
-P4 (T2.1–T2.5, Supabase and data layer) does not begin until P3 is reviewed and confirmed. **P4 is where the first credential is needed** — a Supabase project URL and anon key; I'll ask for it at the start of that phase, not before.
+1. **T2.1** — add `@supabase/supabase-js`; connect to the user-provided project
+2. **T2.2** — apply schema SQL: five tables, constraints, indexes, `set_updated_at` trigger, RLS
+3. **T2.3** — seed `oracle_sources` and `weather_feed` with all three demo scenarios
+4. **T2.4** — `services/supabase.ts` — every query degrades to `null` on failure, never throws
+5. **T2.5** — replace `chain.ts` with `insurance.ts`: read-only contract access, 5s TTL cache
+
+P5 (T2.6–T2.10, oracle harness, M2 checkpoint) does not begin until P4 is reviewed and confirmed. P5 also carries a new item, **T2.6a**, added per user instruction 2026-09-09: wrap the harness's data read behind a `WeatherSource` adapter interface once T2.6 works, so real IMD/Sentinel feeds can later replace the simulated one without touching the contract or the (future, P9) notification pipeline.
 
 Before starting, read [docs/AgentRules.md](./docs/AgentRules.md), [docs/TRD.md](./docs/TRD.md) §Contract Specification, and [docs/Schema.md](./docs/Schema.md) — Schema is canonical for every entity and field name.
 
