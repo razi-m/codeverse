@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useAuth } from "../../lib/AuthContext.js";
 import { fetchMe } from "../../lib/api.js";
+import { LogoutButton } from "../shared/LogoutButton.js";
 
 /**
  * First gate in front of /admin: a Supabase-authenticated insurer/admin
@@ -100,9 +101,19 @@ export function RequireInsurerSession({ children }: { children: ReactNode }) {
     return (
       <div style={{ padding: 24, background: "var(--surface-sunken)", borderRadius: 8 }}>
         <p>This account is not authorized for the insurer console.</p>
+        <div style={{ marginTop: 16 }}>
+          <LogoutButton />
+        </div>
       </div>
     );
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <div style={{ display: "flex", justifyContent: "flex-end", padding: "8px 24px 0" }}>
+        <LogoutButton />
+      </div>
+      {children}
+    </>
+  );
 }

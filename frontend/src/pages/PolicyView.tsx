@@ -19,8 +19,10 @@ import { HowThisWorks } from "../components/farmer/HowThisWorks.js";
 import { FarmerErrorState } from "../components/farmer/FarmerErrorState.js";
 import { LanguageSwitcher } from "../components/farmer/LanguageSwitcher.js";
 import { ParcelPlan } from "../components/farmer/ParcelPlan.js";
+import { SatelliteView } from "../components/farmer/SatelliteView.js";
 import { WhatsappOptIn } from "../components/farmer/WhatsappOptIn.js";
 import { Masthead, RegistryStrip } from "../components/shared/Masthead.js";
+import { LogoutButton } from "../components/shared/LogoutButton.js";
 import { PolicySkeleton } from "./PolicySkeleton.js";
 
 const AUTO_REFRESH_MS = 15_000;
@@ -78,6 +80,10 @@ export default function PolicyView() {
           setError("We couldn't find a policy with that number. Please check it and try again.");
         } else if (err instanceof Error && /deployment|RPC/i.test(err.message)) {
           setError("The weather record service is temporarily unavailable. Please try again in a moment.");
+        } else if (err instanceof Error && /not authenticated|invalid or expired session/i.test(err.message)) {
+          setError("Please log in to view this policy.");
+        } else if (err instanceof Error && /not authorized/i.test(err.message)) {
+          setError("This policy isn't assigned to your account.");
         } else {
           setError("Something went wrong. Please try again.");
         }
@@ -110,7 +116,14 @@ export default function PolicyView() {
   if (error || !policy || !ledger) {
     return (
       <div className="farmer-page">
-        <Masthead actions={<LanguageSwitcher value={language} onChange={setLanguage} />} />
+        <Masthead
+        actions={
+          <div style={{ display: "flex", gap: "var(--sp-3)", alignItems: "center" }}>
+            <LanguageSwitcher value={language} onChange={setLanguage} />
+            <LogoutButton />
+          </div>
+        }
+      />
         <RegistryStrip index="Cadastral Index // 2026.S2-Kharif" id="—" />
         <FarmerErrorState message={error ?? "Unable to load this policy."} onRetry={() => load()} />
       </div>
@@ -128,7 +141,14 @@ export default function PolicyView() {
 
   return (
     <div className="farmer-page">
-      <Masthead actions={<LanguageSwitcher value={language} onChange={setLanguage} />} />
+      <Masthead
+        actions={
+          <div style={{ display: "flex", gap: "var(--sp-3)", alignItems: "center" }}>
+            <LanguageSwitcher value={language} onChange={setLanguage} />
+            <LogoutButton />
+          </div>
+        }
+      />
       <RegistryStrip
         index="Cadastral Index // 2026.S2-Kharif"
         id={`ID: ${documentId(policy)}`}
@@ -163,6 +183,22 @@ export default function PolicyView() {
               cropType={policy.cropType}
               areaAcres={policy.areaAcres ?? 3.8}
               raining={!breached}
+            />
+          </div>
+        )}
+
+        {policy.coordinates && (
+          <div style={{ ["--i" as string]: 1 }}>
+            <SatelliteView
+              regionLabel={policy.regionDisplayName}
+              latitude={policy.coordinates.latitude}
+              longitude={policy.coordinates.longitude}
+              status={policy.status}
+              funded={policy.funded}
+              thresholdValue={policy.thresholdValue}
+              currentReading={currentReading}
+              consensusReached={currentReading !== null}
+              coverageAmount={policy.coverageAmount}
             />
           </div>
         )}

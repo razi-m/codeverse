@@ -5,11 +5,13 @@
 -- a real Supabase Auth phone-OTP login has actually happened once — there
 -- is no way to fabricate that server-side without a real SMS round trip.
 
--- Step 1: point the seeded demo farmer at the phone number you will
--- actually log in with during the demo. Run this FIRST, before logging in.
-update farmers
-set phone = '6005529862' -- replace with the real demo number, 10 digits, no country code
-where wallet_address ilike '0x90F79bf6EB2c4f870365E785982E1f101E93b906';
+-- Step 1: point the demo farmer (on-chain policy 1's farmer address) at
+-- the phone number you will actually log in with during the demo. No
+-- farmers row exists yet for this wallet — insert it if missing, or just
+-- update the phone if it already exists. Run this FIRST, before logging in.
+insert into farmers (wallet_address, full_name, phone)
+values ('0x90F79bf6EB2c4f870365E785982E1f101E93b906', 'Demo Farmer', '6005529862')
+on conflict (wallet_address) do update set phone = excluded.phone;
 
 -- Step 2: log in once via the running frontend's /login with that same
 -- number. Supabase Auth creates the auth.users row, and POST
