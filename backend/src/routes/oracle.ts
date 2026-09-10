@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { SupabaseWeatherSource } from "../services/supabaseWeatherSource.js";
+import { createWeatherSource, isLiveWeatherSource } from "../services/weatherSourceFactory.js";
 import { runScenario } from "../services/oracleHarness.js";
 import * as insurance from "../services/insurance.js";
 
@@ -12,6 +12,12 @@ type Scenario = (typeof VALID_SCENARIOS)[number];
  * Demo control endpoint (T2.7) — submits both feeds' readings for a
  * scenario and evaluates. Not farmer-facing; this is what a demo operator
  * (or a curl command) uses to make a scenario happen on command.
+ *
+ * `scenario` selects among deterministic Supabase fixtures and is required
+ * only when WEATHER_SOURCE=simulated (the default); in live mode
+ * (WEATHER_SOURCE=open-meteo) there is no scenario to pick, only whatever
+ * Open-Meteo actually reports for the policy's region — see
+ * services/weatherSourceFactory.ts (P9).
  */
 oracleRouter.post("/simulate", async (req, res, next) => {
   try {
@@ -20,7 +26,7 @@ oracleRouter.post("/simulate", async (req, res, next) => {
     if (!Number.isInteger(policyId) || policyId < 1) {
       return res.status(400).json({ error: "policyId must be a positive integer" });
     }
-    if (!VALID_SCENARIOS.includes(scenario)) {
+    if (!isLiveWeatherSource() && !VALID_SCENARIOS.includes(scenario)) {
       return res.status(400).json({ error: `scenario must be one of ${VALID_SCENARIOS.join(", ")}` });
     }
 
@@ -29,14 +35,20 @@ oracleRouter.post("/simulate", async (req, res, next) => {
       ? periodId
       : Math.floor(Date.now() / 1000 / 86400);
 
-    const source = new SupabaseWeatherSource(scenario as Scenario);
+    const source = createWeatherSource(scenario as Scenario | undefined);
     const result = await runScenario(source, {
       policyId,
       regionId: policy.regionId,
       periodId: resolvedPeriodId,
     });
 
-    res.json({ policyId, scenario, periodId: resolvedPeriodId, ...result });
+    res.json({
+      policyId,
+      scenario: isLiveWeatherSource() ? null : scenario,
+      source: source.name,
+      periodId: resolvedPeriodId,
+      ...result,
+    });
   } catch (err) {
     next(err);
   }

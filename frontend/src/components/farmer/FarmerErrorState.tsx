@@ -10,8 +10,8 @@ export function FarmerErrorState({
 }) {
   return (
     <div className="error-state" role="alert">
-      <div className="error-state__icon" aria-hidden="true">
-        ⚠
+      <div className="error-state__mark" aria-hidden="true">
+        ⌗
       </div>
       <p className="error-state__text">{message}</p>
       {onRetry && <Button onClick={onRetry}>Try again</Button>}

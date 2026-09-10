@@ -8,9 +8,8 @@ export function ClaimLedger({ entries }: { entries: LedgerEntryData[] }) {
 
   return (
     <Card>
-      <h2 style={{ fontSize: "var(--fs-h2)", marginTop: 0 }}>What happened</h2>
       {newestFirst.length === 0 ? (
-        <p style={{ color: "var(--text-muted)" }}>No activity yet.</p>
+        <p className="empty-note">Nothing has happened on this policy yet.</p>
       ) : (
         <ol className="claim-ledger" aria-label="Claim history, most recent first">
           {newestFirst.map((entry) => (

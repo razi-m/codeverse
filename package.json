@@ -2,6 +2,9 @@
   "name": "global-hackathon",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=18"
+  },
   "workspaces": ["contracts", "backend", "frontend"],
   "scripts": {
     "chain": "npm run node --workspace @global/contracts",

@@ -1,277 +1,1338 @@
-/* Farmer surface — docs/Design.md § Layout Principles, Mobile Experience.
-   One column, mobile-first at 360px, capped at 640px, generous spacing. */
+/* ============================================================
+   Farmer surface — cadastral survey document.
+   One column, mobile-first at 360px, capped at 720px.
+   ============================================================ */
 
 .farmer-page {
-  max-width: 640px;
+  max-width: 720px;
   margin: 0 auto;
-  padding: var(--sp-4) var(--sp-4) var(--sp-16);
+  padding: 0 var(--sp-4) var(--sp-24);
 }
 
 @media (min-width: 768px) {
   .farmer-page {
-    padding: var(--sp-6) var(--sp-4) var(--sp-16);
+    padding: 0 var(--sp-6) var(--sp-24);
   }
 }
 
-.farmer-page h1 {
-  font-size: var(--fs-h1);
+/* ============================================================
+   Masthead — the document header
+   ============================================================ */
+
+.masthead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-6) 0 var(--sp-4);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+
+.masthead__brand {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  text-decoration: none;
+  color: inherit;
+}
+
+.masthead__mark {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  align-self: center;
+  color: var(--ink);
+}
+
+.masthead__name {
+  font-family: var(--font-display);
+  font-size: 27px;
+  line-height: 1;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin: 0;
+}
+
+.masthead__sub {
+  display: block;
+  font-family: var(--font);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-faint);
+  margin-top: 3px;
+}
+
+/* Registry strip: the "official document" band under the masthead */
+.registry-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font);
+  font-style: italic;
+  font-size: var(--fs-small);
+  color: var(--text-faint);
+  margin-bottom: var(--sp-8);
+}
+
+.registry-strip__left {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.registry-strip__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ink);
+  flex-shrink: 0;
+}
+
+.registry-strip__id {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================================
+   Hero
+   ============================================================ */
+
+.hero {
+  padding: var(--sp-6) 0 var(--sp-8);
+}
+
+.hero__eyebrow {
+  font-family: var(--font);
+  font-style: italic;
+  font-size: var(--fs-small);
+  color: var(--copper);
+  margin: 0 0 var(--sp-3);
+}
+
+.hero__title {
+  font-family: var(--font-display);
+  font-size: var(--fs-hero);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.022em;
+  color: var(--ink);
+  margin: 0 0 var(--sp-4);
+  max-width: 15ch;
+}
+
+.hero__title em {
+  font-style: italic;
+  color: var(--copper);
+}
+
+.hero__lede {
+  font-size: var(--fs-body);
+  color: var(--text-muted);
+  margin: 0;
+  max-width: 46ch;
+  line-height: 1.6;
+}
+
+/* ============================================================
+   Card — a leaf of the document
+   ============================================================ */
+
+.card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: var(--sp-6);
+  margin-bottom: var(--sp-4);
+  box-shadow: var(--lift-1);
+}
+
+.card__title {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--text);
   margin: 0 0 var(--sp-4);
 }
 
-/* --- Card --- */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: var(--sp-6);
-  margin-bottom: var(--sp-4);
+/* Section heading with a rule running to the right edge */
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin: var(--sp-12) 0 var(--sp-4);
 }
 
-/* --- Button --- */
+.section-head__text {
+  font-family: var(--font);
+  font-style: italic;
+  font-size: var(--fs-small);
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.section-head__rule {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+
 .button {
-  font: inherit;
-  font-size: var(--fs-body);
-  min-height: 44px;
-  min-width: 44px;
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 500;
+  min-height: 46px;
+  min-width: 46px;
   padding: var(--sp-3) var(--sp-6);
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border-radius: 3px;
+  border: 1px solid var(--border-strong);
+  background: transparent;
   color: var(--text);
   cursor: pointer;
+  transition: background 0.15s var(--ease-out), color 0.15s var(--ease-out),
+    border-color 0.15s var(--ease-out);
 }
 
 .button:hover {
-  border-color: var(--active);
+  border-color: var(--ink);
+  color: var(--ink);
+  background: var(--surface-sunken);
 }
 
 .button--primary {
-  background: var(--accent-solid);
-  border-color: var(--accent-solid);
-  color: white;
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+}
+
+.button--primary:hover {
+  background: var(--ink-deep);
+  border-color: var(--ink-deep);
+  color: var(--bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  .button--primary {
+    background: var(--accent-solid);
+    border-color: var(--accent-solid);
+    color: #f2f5fb;
+  }
+  .button--primary:hover {
+    background: var(--ink-soft);
+    border-color: var(--ink-soft);
+    color: #f2f5fb;
+  }
 }
 
 .button:disabled {
-  opacity: 0.6;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
-/* --- Badge --- */
-.badge {
-  display: inline-flex;
+/* Big CTA bar — the landing page's primary action */
+.cta-bar {
+  display: flex;
   align-items: center;
-  gap: var(--sp-1);
-  padding: var(--sp-1) var(--sp-2);
-  border-radius: 999px;
-  font-size: var(--fs-small);
-  font-weight: 600;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  width: 100%;
+  padding: var(--sp-4) var(--sp-6);
+  background: var(--ink);
+  color: var(--bg);
+  border: 1px solid var(--ink);
+  border-radius: 3px;
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  min-height: 62px;
+  transition: background 0.25s var(--ease-out), transform 0.18s var(--ease-out);
 }
 
-.badge--paid {
-  background: color-mix(in srgb, var(--paid) 15%, transparent);
-  color: var(--paid);
-}
-.badge--active {
-  background: color-mix(in srgb, var(--active) 15%, transparent);
-  color: var(--active);
-}
-.badge--waiting {
-  background: color-mix(in srgb, var(--waiting) 15%, transparent);
-  color: var(--waiting);
-}
-.badge--ended {
-  background: color-mix(in srgb, var(--ended) 15%, transparent);
-  color: var(--ended);
+.cta-bar:hover {
+  background: var(--ink-deep);
 }
 
-/* --- StatusBanner --- */
+.cta-bar__arrow {
+  font-family: var(--font);
+  flex-shrink: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .cta-bar {
+    background: var(--accent-solid);
+    border-color: var(--accent-solid);
+    color: #f2f5fb;
+  }
+  .cta-bar:hover {
+    background: var(--ink-soft);
+  }
+}
+
+/* ============================================================
+   Policy lookup
+   ============================================================ */
+
+.policy-lookup {
+  display: flex;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.policy-lookup input {
+  flex: 1 1 200px;
+  min-height: 46px;
+  padding: var(--sp-3) var(--sp-4);
+  font-family: var(--font-mono);
+  font-size: 16px; /* >=16px: prevents iOS auto-zoom */
+  letter-spacing: 0.06em;
+  color: var(--text);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-strong);
+  border-radius: 2px;
+  transition: border-color 0.2s var(--ease-out), background 0.2s var(--ease-out);
+}
+
+.policy-lookup input::placeholder {
+  color: var(--text-faint);
+  letter-spacing: 0.04em;
+}
+
+.policy-lookup input:focus {
+  outline: none;
+  border-color: var(--ink);
+  background: var(--surface-raised);
+}
+
+/* ============================================================
+   Status banner — the answer, above the fold
+   ============================================================ */
+
 .status-banner {
+  position: relative;
   display: flex;
   align-items: flex-start;
-  gap: var(--sp-3);
+  gap: var(--sp-4);
   padding: var(--sp-6);
-  border-radius: 12px;
-  margin-bottom: var(--sp-6);
-  font-size: var(--fs-hero);
-  line-height: 1.25;
-  font-weight: 600;
+  padding-left: calc(var(--sp-6) + 4px);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--surface);
+  box-shadow: var(--lift-1);
+  margin-bottom: var(--sp-4);
+  overflow: hidden;
+}
+
+/* Colour carried by a spine, not a wash — keeps text contrast intact */
+.status-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--ended);
+}
+
+.status-banner--paid::before {
+  background: var(--paid);
+}
+.status-banner--active::before {
+  background: var(--ink);
+}
+.status-banner--waiting::before {
+  background: var(--waiting);
+}
+.status-banner--ended::before {
+  background: var(--ended);
 }
 
 .status-banner__icon {
+  font-size: 20px;
+  line-height: 1.3;
   flex-shrink: 0;
-  font-size: 1.1em;
-  line-height: 1;
+  color: var(--ended);
 }
 
-.status-banner--paid {
-  background: color-mix(in srgb, var(--paid) 12%, var(--surface));
+.status-banner--paid .status-banner__icon {
   color: var(--paid);
 }
-.status-banner--active {
-  background: color-mix(in srgb, var(--active) 10%, var(--surface));
-  color: var(--active);
+.status-banner--active .status-banner__icon {
+  color: var(--ink);
 }
-.status-banner--waiting {
-  background: color-mix(in srgb, var(--waiting) 12%, var(--surface));
+.status-banner--waiting .status-banner__icon {
   color: var(--waiting);
 }
-.status-banner--ended {
-  background: var(--surface-sunken);
-  color: var(--text-muted);
+
+.status-banner__body {
+  min-width: 0;
 }
 
-/* --- PolicyTermsCard --- */
+.status-banner__label {
+  display: block;
+  font-family: var(--font);
+  font-style: italic;
+  font-size: var(--fs-small);
+  color: var(--text-faint);
+  margin-bottom: var(--sp-1);
+}
+
+.status-banner__text {
+  font-family: var(--font-display);
+  font-size: 23px;
+  line-height: 1.28;
+  letter-spacing: -0.012em;
+  color: var(--text);
+}
+
+/* ============================================================
+   Terms grid — the schedule of the policy
+   ============================================================ */
+
 .terms-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--sp-4);
-}
-.terms-grid dt {
-  font-size: var(--fs-small);
-  color: var(--text-muted);
+  grid-template-columns: 1fr;
+  gap: 0;
   margin: 0;
-}
-.terms-grid dd {
-  font-size: var(--fs-body);
-  margin: 0;
-  font-weight: 600;
 }
 
-/* --- ThresholdMeter --- */
-.threshold-meter {
-  margin-top: var(--sp-3);
+@media (min-width: 560px) {
+  .terms-grid {
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--sp-8);
+  }
 }
-.threshold-meter__track {
-  position: relative;
-  height: 12px;
-  border-radius: 6px;
-  background: var(--surface-sunken);
-  overflow: visible;
-  margin: var(--sp-6) 0 var(--sp-2);
+
+.terms-grid > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px dotted var(--border);
 }
-.threshold-meter__fill {
-  height: 100%;
-  border-radius: 6px;
-  background: var(--active);
-  transition: width 300ms var(--ease-in-out);
-}
-.threshold-meter__fill--below {
-  background: var(--paid);
-}
-.threshold-meter__marker {
-  position: absolute;
-  top: -6px;
-  bottom: -6px;
-  width: 2px;
-  background: var(--text);
-}
-.threshold-meter__marker-label {
-  position: absolute;
-  top: -28px;
-  transform: translateX(-50%);
-  font-size: var(--fs-small);
-  color: var(--text-muted);
+
+.terms-grid dt {
+  font-family: var(--font);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text-faint);
   white-space: nowrap;
 }
+
+.terms-grid dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.money,
+.measurement {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* ============================================================
+   Readout — the big number pair (observed vs trigger)
+   ============================================================ */
+
+.readout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-6);
+  padding: var(--sp-2) 0 var(--sp-6);
+}
+
+@media (min-width: 560px) {
+  .readout {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-8);
+  }
+}
+
+.readout__label {
+  display: block;
+  font-family: var(--font);
+  font-style: italic;
+  font-size: var(--fs-small);
+  color: var(--text-faint);
+  margin-bottom: var(--sp-1);
+}
+
+.readout__value {
+  font-family: var(--font-mono);
+  font-size: var(--fs-num);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.readout__unit {
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--text-faint);
+}
+
+.readout__note {
+  display: block;
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+  margin-top: var(--sp-2);
+}
+
+.readout--breach .readout__value {
+  color: var(--copper);
+}
+
+.readout--breach .readout__note {
+  color: var(--copper);
+}
+
+/* ============================================================
+   Threshold meter — a ruled gauge, not a chart
+   ============================================================ */
+
+.threshold-meter {
+  margin-top: var(--sp-2);
+}
+
+/* Large mono reading floating above the gauge, positioned at the fill
+   head — the screenshot's "12.15 mm" callout. */
+.threshold-meter__callout {
+  position: relative;
+  height: 46px;
+  margin-bottom: var(--sp-2);
+}
+
+.threshold-meter__callout-value {
+  position: absolute;
+  bottom: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  transition: left 0.6s var(--ease-out);
+}
+
+.threshold-meter__callout-unit {
+  font-size: 20px;
+  color: var(--ink-soft);
+  margin-left: 6px;
+}
+
+.threshold-meter--below .threshold-meter__callout-value {
+  color: var(--copper);
+}
+
+.threshold-meter--below .threshold-meter__callout-unit {
+  color: var(--copper);
+}
+
+.threshold-meter__track {
+  position: relative;
+  height: 30px;
+  background: var(--surface-sunken);
+  border: 0;
+  border-radius: 999px;
+  overflow: visible;
+  margin-bottom: var(--sp-8);
+}
+
+/* The portion of the track beyond the limit reads as "safe" */
+.threshold-meter__beyond {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  background: color-mix(in srgb, var(--paid) 16%, var(--surface-sunken));
+  border-radius: 0 999px 999px 0;
+}
+
+.threshold-meter__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--ink);
+  border-radius: 999px;
+  transition: width 0.6s var(--ease-out);
+}
+
+.threshold-meter__fill--below {
+  background: var(--ink);
+}
+
+/* Knob at the head of the fill */
+.threshold-meter__knob {
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(26, 26, 24, 0.28);
+  transform: translate(-50%, -50%);
+  transition: left 0.6s var(--ease-out);
+}
+
+/* Red dotted limit marker, running above and below the track */
+.threshold-meter__marker {
+  position: absolute;
+  top: -16px;
+  bottom: -16px;
+  width: 5px;
+  transform: translateX(-50%);
+  background-image: linear-gradient(
+    var(--copper) 0 6px,
+    transparent 6px 12px
+  );
+  background-size: 5px 12px;
+  background-repeat: repeat-y;
+  border-radius: 3px;
+}
+
+/* Dot cap sitting on top of the marker line */
+.threshold-meter__marker::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--copper);
+  transform: translateX(-50%);
+}
+
+.threshold-meter__marker-label {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--copper);
+}
+
 .threshold-meter__labels {
   display: flex;
   justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-faint);
+}
+
+.threshold-meter__labels span {
+  font-size: 22px;
+}
+
+.threshold-meter__labels em {
+  font-style: normal;
+  font-size: 14px;
+  margin-left: 4px;
+}
+
+/* ============================================================
+   Stat panels — the grey pair under the gauge
+   ============================================================ */
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+}
+
+@media (min-width: 560px) {
+  .stat-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.stat-panel {
+  padding: var(--sp-4);
+  background: var(--surface-sunken);
+  border-radius: 4px;
+}
+
+.stat-panel__label {
+  display: block;
+  font-family: var(--font);
+  font-style: italic;
   font-size: var(--fs-small);
+  color: var(--text-muted);
+  margin-bottom: var(--sp-1);
+}
+
+.stat-panel__value {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 27px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.stat-panel__value em {
+  font-style: normal;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-left: 3px;
+}
+
+.stat-panel__note {
+  display: block;
+  font-size: var(--fs-small);
+  color: var(--ink);
+  margin-top: var(--sp-2);
+}
+
+.stat-panel--neutral .stat-panel__value {
+  color: var(--text);
+}
+
+.stat-panel--neutral .stat-panel__note {
   color: var(--text-muted);
 }
 
-/* --- ClaimLedger / LedgerEntry --- */
+/* Deficit / status chip, top-right of a section head */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  padding: 4px var(--sp-3);
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.chip--deficit {
+  color: var(--copper);
+  background: color-mix(in srgb, var(--copper) 12%, var(--surface));
+}
+
+.chip--satisfied {
+  color: #fff;
+  background: var(--paid);
+}
+
+/* Guarantee note — the reassurance bar at the foot of the readout */
+.guarantee {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  margin-top: var(--sp-4);
+  background: var(--surface-sunken);
+  border-radius: 4px;
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.guarantee strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.guarantee__mark {
+  flex-shrink: 0;
+  color: var(--paid);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+/* ============================================================
+   Payout hero — the settled-claim headline
+   ============================================================ */
+
+.payout-hero {
+  padding: var(--sp-4) 0 var(--sp-6);
+}
+
+.payout-hero__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-4);
+}
+
+.payout-hero__eyebrow {
+  font-family: var(--font);
+  font-style: italic;
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+  margin: 0 0 var(--sp-2);
+}
+
+.payout-hero__headline {
+  font-family: var(--font-display);
+  font-size: var(--fs-h1);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin: 0 0 var(--sp-3);
+}
+
+.payout-hero__sub {
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+  margin: 0;
+  max-width: 62ch;
+}
+
+.payout-hero__sub strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ============================================================
+   Parcel plan — the cadastral drawing
+   ============================================================ */
+
+.parcel {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--surface);
+  box-shadow: var(--lift-1);
+  margin-bottom: var(--sp-4);
+  overflow: hidden;
+}
+
+.parcel__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-6);
+  border-bottom: 1px solid var(--border);
+}
+
+.parcel__coords {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.parcel__coords span {
+  display: block;
+  color: var(--text-faint);
+  text-transform: uppercase;
+}
+
+.parcel__badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 5px var(--sp-2);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.parcel__badge--live {
+  color: var(--ink);
+  border-color: var(--ink-soft);
+}
+
+.parcel__canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--surface-sunken);
+}
+
+.parcel__foot {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-6);
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.parcel__foot-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+/* SVG plot animation */
+.plot-boundary {
+  stroke-dasharray: 900;
+  stroke-dashoffset: 900;
+  animation: plot-draw 1.8s var(--ease-out) forwards;
+  animation-delay: 0.35s;
+}
+
+@keyframes plot-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.plot-pin {
+  animation: fade 0.6s var(--ease-out) backwards;
+  animation-delay: 1.6s;
+}
+
+.rain-tick {
+  animation: rain-fall 2.4s linear infinite;
+}
+
+@keyframes rain-fall {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  35% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+/* ============================================================
+   Claim ledger — the record of decisions
+   ============================================================ */
+
 .claim-ledger {
   list-style: none;
   margin: 0;
   padding: 0;
 }
+
 .ledger-entry {
-  display: flex;
+  position: relative;
+  display: grid;
+  grid-template-columns: 14px 1fr;
   gap: var(--sp-4);
   padding: var(--sp-4) 0;
-  border-bottom: 1px solid var(--border);
-  animation: ledger-appear 250ms var(--ease-out);
+  border-bottom: 1px dotted var(--border);
 }
+
 .ledger-entry:last-child {
-  border-bottom: none;
+  border-bottom: 0;
+  padding-bottom: 0;
 }
+
+/* Timeline spine + node */
+.ledger-entry__node {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding-top: 7px;
+}
+
+.ledger-entry__node::before {
+  content: "";
+  position: absolute;
+  top: 15px;
+  bottom: -22px;
+  width: 1px;
+  background: var(--border);
+}
+
+.ledger-entry:last-child .ledger-entry__node::before {
+  display: none;
+}
+
+.ledger-entry__dot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1.5px solid var(--border-strong);
+  z-index: 1;
+}
+
+.ledger-entry--paid .ledger-entry__dot {
+  background: var(--paid);
+  border-color: var(--paid);
+}
+
+.ledger-entry--rejected .ledger-entry__dot {
+  background: var(--copper);
+  border-color: var(--copper);
+}
+
 .ledger-entry__date {
-  flex-shrink: 0;
-  width: 84px;
-  font-size: var(--fs-small);
-  color: var(--text-muted);
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 3px;
 }
+
 .ledger-entry__text {
-  font-size: var(--fs-body);
+  display: block;
+  color: var(--text);
+  line-height: 1.55;
 }
 
-@keyframes ledger-appear {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.ledger-entry--paid .ledger-entry__text {
+  color: var(--paid);
+  font-weight: 500;
 }
 
-/* --- VerifyPanel / HowThisWorks (collapsible, closed by default) --- */
+/* ============================================================
+   Disclosure (How this works / Verify)
+   ============================================================ */
+
 .disclosure {
-  margin-bottom: var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--surface);
+  margin-bottom: var(--sp-3);
+  overflow: hidden;
 }
+
 .disclosure__trigger {
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
-  width: 100%;
-  min-height: 44px;
-  background: none;
-  border: none;
-  padding: var(--sp-2) 0;
-  font: inherit;
-  font-size: var(--fs-body);
-  font-weight: 600;
-  color: var(--text);
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-6);
   cursor: pointer;
-  text-align: left;
+  font-family: var(--font);
+  font-style: italic;
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+  list-style: none;
+  transition: color 0.15s var(--ease-out), background 0.15s var(--ease-out);
 }
+
+.disclosure__trigger::-webkit-details-marker {
+  display: none;
+}
+
+.disclosure__trigger:hover {
+  color: var(--ink);
+  background: var(--surface-sunken);
+}
+
 .disclosure__chevron {
-  transition: transform 200ms var(--ease-out);
+  display: inline-block;
+  transition: transform 0.28s var(--ease-out);
+  color: var(--text-faint);
 }
+
 .disclosure[open] .disclosure__chevron {
   transform: rotate(90deg);
 }
+
 .disclosure__content {
-  padding: var(--sp-2) 0 var(--sp-4);
-  font-size: var(--fs-small);
+  padding: 0 var(--sp-6) var(--sp-6);
   color: var(--text-muted);
-}
-.disclosure__content code {
-  font-family: var(--font-mono);
-  font-size: 0.9em;
-  word-break: break-all;
+  font-size: var(--fs-small);
+  animation: fade 0.4s var(--ease-out);
 }
 
-/* --- PolicyLookup --- */
-.policy-lookup {
-  display: flex;
-  gap: var(--sp-2);
+.disclosure__content p {
+  margin: 0 0 var(--sp-3);
+  line-height: 1.65;
 }
-.policy-lookup input {
-  flex: 1;
-  min-height: 44px;
-  font: inherit;
-  font-size: var(--fs-body);
-  padding: 0 var(--sp-4);
+
+.disclosure__content code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  word-break: break-all;
+  color: var(--text);
+  background: var(--surface-sunken);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 2px;
+  padding: 1px 5px;
+}
+
+/* ============================================================
+   Language switcher
+   ============================================================ */
+
+.language-switcher {
+  display: flex;
+  gap: 2px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 2px;
+  background: var(--surface-sunken);
+  flex-shrink: 0;
+}
+
+.language-switcher__option {
+  min-height: 30px;
+  min-width: 38px;
+  padding: 0 var(--sp-3);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s var(--ease-out), color 0.15s var(--ease-out);
+}
+
+.language-switcher__option:hover {
+  color: var(--ink);
   background: var(--surface);
+}
+
+.language-switcher__option[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  .language-switcher__option[aria-pressed="true"] {
+    background: var(--accent-solid);
+    color: #f2f5fb;
+  }
+}
+
+/* ============================================================
+   Tab bar — bottom navigation
+   ============================================================ */
+
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  padding-bottom: max(var(--sp-3), env(safe-area-inset-bottom));
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.tabbar__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 50px;
+  padding: var(--sp-2);
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--text-faint);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s var(--ease-out), background 0.15s var(--ease-out);
+}
+
+.tabbar__item:hover {
+  color: var(--ink);
+  background: var(--surface-sunken);
+}
+
+.tabbar__item[aria-current="page"] {
+  color: var(--ink);
+  background: var(--surface-sunken);
+}
+
+.tabbar__icon {
+  width: 19px;
+  height: 19px;
+}
+
+/* ============================================================
+   Weather strip — daily rainfall bars
+   ============================================================ */
+
+.wx-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.wx-row {
+  display: grid;
+  grid-template-columns: 92px 1fr 60px;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) 0;
+  border-bottom: 1px dotted var(--border);
+}
+
+.wx-row:last-child {
+  border-bottom: 0;
+}
+
+.wx-row__date {
+  font-family: var(--font);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-faint);
+}
+
+.wx-row__track {
+  height: 9px;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.wx-row__bar {
+  height: 100%;
+  background: var(--ink-soft);
+}
+
+.wx-row__bar--dry {
+  background: var(--copper);
+}
+
+.wx-row__val {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
   color: var(--text);
 }
 
-/* --- Skeleton --- */
+/* ============================================================
+   Audit rows
+   ============================================================ */
+
+.audit-row {
+  padding: var(--sp-4) 0;
+  border-bottom: 1px dotted var(--border);
+}
+
+.audit-row:last-child {
+  border-bottom: 0;
+}
+
+.audit-row__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-2);
+}
+
+.audit-row__name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--text);
+}
+
+.audit-row__block {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+}
+
+.audit-row__hash {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  word-break: break-all;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   Error / empty states
+   ============================================================ */
+
+.error-state {
+  text-align: center;
+  padding: var(--sp-16) var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--surface);
+}
+
+.error-state__mark {
+  font-family: var(--font-display);
+  font-size: 32px;
+  color: var(--copper);
+  margin-bottom: var(--sp-4);
+}
+
+.error-state__text {
+  color: var(--text-muted);
+  margin: 0 auto var(--sp-6);
+  max-width: 40ch;
+}
+
+.empty-note {
+  color: var(--text-faint);
+  font-size: var(--fs-small);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ============================================================
+   Skeleton
+   ============================================================ */
+
 .skeleton {
   background: linear-gradient(
     90deg,
@@ -280,39 +1341,195 @@
     var(--surface-sunken) 75%
   );
   background-size: 200% 100%;
-  animation: skeleton-shimmer 1200ms linear infinite;
-  border-radius: 6px;
+  animation: shimmer 1.5s linear infinite;
+  border-radius: 2px;
 }
-@keyframes skeleton-shimmer {
-  from {
-    background-position: 200% 0;
-  }
+
+@keyframes shimmer {
   to {
     background-position: -200% 0;
   }
 }
 
-/* --- FarmerErrorState --- */
-.error-state {
-  text-align: center;
-  padding: var(--sp-8) var(--sp-4);
+/* ============================================================
+   Insurer console
+   ============================================================ */
+
+[data-surface="insurer"] {
+  font-family: var(--font);
 }
-.error-state__icon {
-  font-size: 2rem;
-  margin-bottom: var(--sp-2);
+
+.insurer-shell {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-4) var(--sp-24);
 }
-.error-state__text {
+
+.insurer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--sp-6);
+}
+
+.insurer-head h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-hero);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0;
+}
+
+.tabs {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  margin: var(--sp-4) 0 var(--sp-6);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--sp-3);
+}
+
+.tabs button {
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  min-height: 40px;
+  padding: var(--sp-2) var(--sp-4);
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
   color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s var(--ease-out), background 0.15s var(--ease-out),
+    border-color 0.15s var(--ease-out);
+}
+
+.tabs button:hover {
+  color: var(--ink);
+  background: var(--surface-sunken);
+}
+
+.tabs button[aria-current="true"] {
+  color: var(--ink);
+  border-color: var(--border-strong);
+  background: var(--surface);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-small);
+}
+
+.data-table th {
+  font-family: var(--font);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--text-faint);
+  text-align: left;
+  padding: var(--sp-3) var(--sp-3);
+  border-bottom: 1px solid var(--border-strong);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: var(--sp-3);
+  border-bottom: 1px dotted var(--border);
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table tbody tr {
+  transition: background 0.15s var(--ease-out);
+}
+
+.data-table tbody tr:hover {
+  background: var(--surface-sunken);
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.field {
+  display: block;
   margin-bottom: var(--sp-4);
 }
 
-/* --- Numbers --- */
-.money,
-.measurement {
-  font-variant-numeric: tabular-nums;
+.field label {
+  display: block;
+  font-family: var(--font);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-faint);
+  margin-bottom: var(--sp-1);
 }
-.num-hero {
-  font-size: var(--fs-num);
-  font-weight: 700;
-  line-height: 1.1;
+
+.field input,
+.field select {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: var(--text);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-strong);
+  border-radius: 2px;
+}
+
+.field input:focus,
+.field select:focus {
+  outline: none;
+  border-color: var(--ink);
+  background: var(--surface-raised);
+}
+
+.field__error {
+  display: block;
+  font-size: var(--fs-small);
+  color: var(--danger);
+  margin-top: var(--sp-2);
+}
+
+.badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px var(--sp-2);
+  border-radius: 2px;
+  border: 1px solid currentColor;
+}
+
+.badge--paid {
+  color: var(--paid);
+}
+.badge--active {
+  color: var(--ink);
+}
+.badge--waiting {
+  color: var(--waiting);
+}
+.badge--ended {
+  color: var(--ended);
+}
+
+.notice {
+  padding: var(--sp-4);
+  border: 1px solid var(--border-strong);
+  border-left: 3px solid var(--copper);
+  border-radius: 2px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: var(--fs-small);
+  margin-bottom: var(--sp-4);
 }

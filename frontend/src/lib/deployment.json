@@ -1,8 +1,10 @@
 {
-  "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "address": "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
   "chainId": 31337,
   "network": "localhost",
-  "deployedAt": "2026-09-09T14:47:28.329Z",
+  "deployedAt": "2026-09-09T18:45:52.176Z",
+  "deployTxHash": "0x98686f968360e861cf15a66dcb965fac5c0232a9802c9eb0f474ae92154520d5",
+  "deployBlockNumber": 19,
   "abi": [
     {
       "inputs": [],

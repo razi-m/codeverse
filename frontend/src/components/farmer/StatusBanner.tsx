@@ -3,9 +3,16 @@ import type { BadgeTone } from "../shared/Badge.js";
 
 const ICON: Record<BadgeTone, string> = {
   paid: "✓",
-  active: "🛡",
-  waiting: "⏱",
-  ended: "🗄",
+  active: "◈",
+  waiting: "◷",
+  ended: "▪",
+};
+
+const LABEL: Record<BadgeTone, string> = {
+  paid: "Settled",
+  active: "Cover active",
+  waiting: "Awaiting reading",
+  ended: "Cover ended",
 };
 
 function toneFor(status: PolicyStatus): BadgeTone {
@@ -26,8 +33,9 @@ function toneFor(status: PolicyStatus): BadgeTone {
  * The one-sentence answer, above the fold (Design.md § Layout Principles
  * #1 — "Answer first"). role="status" + aria-live="polite" so a screen
  * reader announces it without the page having to be re-focused.
- * --danger never appears here — a non-payout is a correct outcome, not
- * an error (Design.md § Color Palette).
+ * Colour is carried by a spine and the icon, never a background wash —
+ * --danger never appears here, because a non-payout is a correct outcome,
+ * not an error (Design.md § Color Palette).
  */
 export function StatusBanner({ status, summary }: { status: PolicyStatus; summary: string }) {
   const tone = toneFor(status);
@@ -36,7 +44,10 @@ export function StatusBanner({ status, summary }: { status: PolicyStatus; summar
       <span className="status-banner__icon" aria-hidden="true">
         {ICON[tone]}
       </span>
-      <span>{summary}</span>
+      <span className="status-banner__body">
+        <span className="status-banner__label">{LABEL[tone]}</span>
+        <span className="status-banner__text">{summary}</span>
+      </span>
     </div>
   );
 }

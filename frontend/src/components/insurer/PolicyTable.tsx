@@ -10,6 +10,13 @@ const STATUS_LABEL: Record<PolicyStatus, string> = {
   [PolicyStatus.Cancelled]: "Cancelled",
 };
 
+const STATUS_TONE: Record<PolicyStatus, string> = {
+  [PolicyStatus.Active]: "active",
+  [PolicyStatus.PaidOut]: "paid",
+  [PolicyStatus.Expired]: "ended",
+  [PolicyStatus.Cancelled]: "ended",
+};
+
 /**
  * Dense portfolio: ID, farmer, crop, cover, status, funded, last reading
  * (Design.md § Component Inventory). Reads via the backend API — cheaper
@@ -28,59 +35,67 @@ export function PolicyTable() {
       .catch((err) => setError(err instanceof Error ? err.message : "Failed to load policies"));
   }, []);
 
-  if (error) return <p style={{ color: "var(--danger)" }}>{error}</p>;
-  if (!policies) return <p style={{ color: "var(--text-muted)" }}>Loading portfolio…</p>;
-  if (policies.length === 0) return <p style={{ color: "var(--text-muted)" }}>No policies yet.</p>;
+  if (error) return <p className="notice">{error}</p>;
+  if (!policies) return <p className="mono-label">Loading portfolio…</p>;
+  if (policies.length === 0) return <p className="empty-note">No policies yet.</p>;
 
   return (
-    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--fs-body)" }}>
-      <thead>
-        <tr style={{ textAlign: "left", borderBottom: "2px solid var(--border)" }}>
-          <th style={cellStyle}>ID</th>
-          <th style={cellStyle}>Farmer</th>
-          <th style={cellStyle}>Crop</th>
-          <th style={cellStyle}>Region</th>
-          <th style={cellStyle}>Cover</th>
-          <th style={cellStyle}>Threshold</th>
-          <th style={cellStyle}>Status</th>
-          <th style={cellStyle}>Funded</th>
-          <th style={cellStyle}></th>
-        </tr>
-      </thead>
-      <tbody>
-        {policies.map((p) => (
-          <tr key={p.id} style={{ borderBottom: "1px solid var(--border)" }}>
-            <td style={cellStyle}>{p.id}</td>
-            <td style={{ ...cellStyle, fontFamily: "var(--font-mono)", fontSize: "0.85em" }}>
-              {p.farmer.slice(0, 6)}…{p.farmer.slice(-4)}
-            </td>
-            <td style={cellStyle}>{p.cropType}</td>
-            <td style={cellStyle}>{p.regionDisplayName}</td>
-            <td style={cellStyle}>₹{(Number(p.coverageAmount) * 1000).toLocaleString("en-IN")}</td>
-            <td style={cellStyle}>{p.thresholdValue}mm</td>
-            <td style={cellStyle}>{STATUS_LABEL[p.status]}</td>
-            <td style={cellStyle}>
-              {p.funded ? (
-                "Yes"
-              ) : (
-                <span style={{ color: "var(--danger)", fontWeight: 600 }}>Unfunded</span>
-              )}
-            </td>
-            <td style={cellStyle}>
-              <Link to={`/policy/${p.id}`} target="_blank" rel="noreferrer">
-                View
-              </Link>
-              {!p.funded && (
-                <div style={{ marginTop: 4 }}>
-                  <FundPolicyAction policy={p} />
-                </div>
-              )}
-            </td>
+    <div className="table-scroll">
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Farmer</th>
+            <th>Crop</th>
+            <th>Region</th>
+            <th>Cover</th>
+            <th>Trigger</th>
+            <th>Status</th>
+            <th>Funded</th>
+            <th />
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {policies.map((p) => (
+            <tr key={p.id}>
+              <td style={{ fontFamily: "var(--font-mono)" }}>{p.id}</td>
+              <td style={{ fontFamily: "var(--font-mono)", fontSize: "0.9em" }}>
+                {p.farmer.slice(0, 6)}…{p.farmer.slice(-4)}
+              </td>
+              <td>{p.cropType}</td>
+              <td>{p.regionDisplayName}</td>
+              <td style={{ fontFamily: "var(--font-mono)" }}>
+                ₹{(Number(p.coverageAmount) * 1000).toLocaleString("en-IN")}
+              </td>
+              <td style={{ fontFamily: "var(--font-mono)" }}>&lt;{p.thresholdValue}mm</td>
+              <td>
+                <span className={`badge badge--${STATUS_TONE[p.status]}`}>
+                  {STATUS_LABEL[p.status]}
+                </span>
+              </td>
+              <td>
+                {p.funded ? (
+                  <span className="mono-label">Yes</span>
+                ) : (
+                  <span className="badge" style={{ color: "var(--danger)" }}>
+                    Unfunded
+                  </span>
+                )}
+              </td>
+              <td>
+                <Link to={`/policy/${p.id}`} target="_blank" rel="noreferrer" className="mono-label">
+                  View →
+                </Link>
+                {!p.funded && (
+                  <div style={{ marginTop: "var(--sp-2)" }}>
+                    <FundPolicyAction policy={p} />
+                  </div>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
-
-const cellStyle: React.CSSProperties = { padding: "8px 12px" };

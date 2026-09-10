@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { config, loadDeployment } from "../config.js";
+import { config, loadDeployment, SEPOLIA_CHAIN_ID } from "../config.js";
 
 /**
  * Read-only access to CropInsurance. Replaces chain.ts (the MessageBoard
@@ -56,6 +56,40 @@ export function contractInfo() {
   return deployment
     ? { address: deployment.address, chainId: deployment.chainId, network: deployment.network }
     : null;
+}
+
+let networkCheckCache: { chainId: number; checkedAt: number } | null = null;
+const NETWORK_CHECK_TTL_MS = 60_000;
+
+/**
+ * Refuses to proceed if BLOCKCHAIN_NETWORK's declared intent doesn't match
+ * what the RPC endpoint actually reports — the safety net for a stale or
+ * copy-pasted-wrong RPC_URL. Called before every oracle write (never
+ * before a read — reads are harmless regardless of which chain they hit).
+ * Cheap after the first call: the live chain ID a provider is connected to
+ * cannot change mid-process, so this is cached rather than re-queried
+ * every submission.
+ */
+export async function assertNetworkMatchesConfig(): Promise<void> {
+  if (!networkCheckCache || Date.now() - networkCheckCache.checkedAt > NETWORK_CHECK_TTL_MS) {
+    const network = await provider.getNetwork();
+    networkCheckCache = { chainId: Number(network.chainId), checkedAt: Date.now() };
+  }
+  const actualChainId = networkCheckCache.chainId;
+
+  if (config.blockchainNetwork === "sepolia" && actualChainId !== SEPOLIA_CHAIN_ID) {
+    throw new Error(
+      `BLOCKCHAIN_NETWORK=sepolia but RPC_URL is connected to chain ${actualChainId}, not Sepolia (${SEPOLIA_CHAIN_ID}). ` +
+        `Refusing to submit — check RPC_URL in backend/.env.`
+    );
+  }
+  if (config.blockchainNetwork === "local" && actualChainId === SEPOLIA_CHAIN_ID) {
+    throw new Error(
+      `BLOCKCHAIN_NETWORK=local but RPC_URL is connected to Sepolia (chain ${SEPOLIA_CHAIN_ID}). ` +
+        `Refusing to submit — this would send real testnet transactions from a config believed to be local-only. ` +
+        `Set BLOCKCHAIN_NETWORK=sepolia in backend/.env if this is intentional.`
+    );
+  }
 }
 
 function contract() {

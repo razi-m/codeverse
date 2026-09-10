@@ -40,6 +40,26 @@ region names. If you want it: create a free project at
 `SUPABASE_URL`/`SUPABASE_ANON_KEY` in `backend/.env` (see
 `backend/.env.example`).
 
+### Optional: live data sources (P9)
+
+By default the oracle harness reads deterministic, hand-seeded scenarios —
+the right behaviour for repeatable judging. Three env vars in
+`backend/.env` (see `backend/.env.example` for full comments) switch parts
+of it to real, live external data instead:
+
+| Variable | Enables | Get it from |
+|---|---|---|
+| `WEATHER_SOURCE=open-meteo` | Real live rainfall via [Open-Meteo](https://open-meteo.com) | Nothing — free, keyless |
+| `WEATHER_SOURCE=sentinel` | Real live NDVI via Sentinel-2 (Copernicus) | Free self-serve OAuth2 client at [dataspace.copernicus.eu](https://dataspace.copernicus.eu) — set `SENTINEL_CLIENT_ID`/`SENTINEL_CLIENT_SECRET` |
+| `SARVAM_API_KEY` | Hindi/Marathi translation of the farmer ledger (`?lang=hi|mr` on `/api/policies/:id/ledger`) | An API key from [sarvam.ai](https://sarvam.ai) |
+
+All three are additive and independently optional — leaving every one
+unset reproduces the exact deterministic demo behaviour described below.
+IMD (rainfall) is not selectable yet: its real API requires an
+institutional key not available in this hackathon session; the same
+`WeatherSource` interface is ready for it. See
+`backend/src/services/weatherSourceFactory.ts` and `docs/handoff.md`.
+
 ## Quickstart
 
 ```bash
@@ -181,9 +201,11 @@ is enforced at the module boundary, not by convention:
   key wasn't available this session (see `backend/sql/schema.sql` header,
   decision D20). The browser still never receives any Supabase
   credential — only which server-side key changed.
-- `VegetationIndexBelow` is declared in the contract's `TriggerType` enum
-  but has no evaluation branch — `RainfallBelow` is the only trigger this
-  build demonstrates.
+- `VegetationIndexBelow` works end-to-end with real Sentinel-2 NDVI data
+  (`WEATHER_SOURCE=sentinel`, above) — verified with a real on-chain
+  payout this session. `evaluatePolicy` doesn't branch on trigger type at
+  all; it compares one `value` to `thresholdValue` regardless of what
+  measurement produced it, so no contract change was needed.
 - This is a demo on a local Hardhat chain. No production deployment,
   audit, or real-money handling is implied.
 

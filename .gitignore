@@ -14,6 +14,10 @@ typechain-types/
 
 # Generated deployment artifacts (frontend keeps a committed placeholder)
 backend/src/deployment.json
+backend/src/deployment.local.json
+backend/src/deployment.sepolia.json
+frontend/src/lib/deployment.local.json
+frontend/src/lib/deployment.sepolia.json
 
 # Editor / OS
 .DS_Store

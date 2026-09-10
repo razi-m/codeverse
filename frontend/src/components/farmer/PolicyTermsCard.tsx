@@ -10,7 +10,6 @@ export function PolicyTermsCard({ policy }: { policy: Policy }) {
 
   return (
     <Card>
-      <h2 style={{ fontSize: "var(--fs-h2)", marginTop: 0 }}>Your policy</h2>
       <dl className="terms-grid">
         <div>
           <dt>Crop</dt>

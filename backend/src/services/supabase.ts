@@ -129,6 +129,16 @@ export async function getClaimExplanations(policyId: number): Promise<ClaimExpla
   );
 }
 
+/** Same table, filtered to one language — the translation cache read path (P9). */
+export async function getClaimExplanationsForLanguage(
+  policyId: number,
+  language: string
+): Promise<ClaimExplanation[] | null> {
+  return safe<ClaimExplanation[]>((db) =>
+    db.from("claim_explanations").select("*").eq("policy_id", policyId).eq("language", language)
+  );
+}
+
 /** Cache-only write — safe to fail silently, the ledger is regenerable from chain events (D11). */
 export async function cacheExplanation(row: Omit<ClaimExplanation, "id" | "created_at">): Promise<void> {
   if (!client) return;
